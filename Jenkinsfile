@@ -116,6 +116,7 @@ pipeline {
                 }
             }
         }
+        
         // Ở dưới không đụng đến
         // stage('Build Docker Image for job') {
         //     when {
@@ -135,7 +136,7 @@ pipeline {
         
         stage('Build Docker Image for company') {
             when {
-                expression { env.BUILD_SERVICE2 == "true" }
+                expression { env.TEST_COMPANY_RESULT == "PASSED"}
             }
             steps {
                 script {
