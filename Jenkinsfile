@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        // DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
     }
@@ -42,17 +42,17 @@ pipeline {
         //     }
         // }
 
-        // stage('Generate Docker Tag') {
-        //     steps {
-        //         script {
-        //             // Sử dụng commit hash và timestamp để tạo Docker tag
-        //             def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-        //             def timestamp = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
-        //             env.DOCKER_TAG = "${commitHash}-${timestamp}"
-        //             echo "Generated Docker Tag: ${env.DOCKER_TAG}"
-        //         }
-        //     }
-        // }
+        stage('Generate Docker Tag') {
+            steps {
+                script {
+                    // Sử dụng commit hash và timestamp để tạo Docker tag
+                    def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    def timestamp = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
+                    env.DOCKER_TAG = "${commitHash}-${timestamp}"
+                    echo "Generated Docker Tag: ${env.DOCKER_TAG}"
+                }
+            }
+        }
 
         stage('Determine Changed Folder') {
             steps {
@@ -81,8 +81,9 @@ pipeline {
                     // Chạy lệnh test
                     def testResult = sh(
                         script: '''
-                            npm ci /company
-                            npm run test /company
+                            cd company
+                            npm ci
+                            npm run test
                         ''', 
                         returnStatus: true // Trả về mã thoát của lệnh
                     )
@@ -132,21 +133,21 @@ pipeline {
         //     }
         // }
         
-        // stage('Build Docker Image for company') {
-        //     when {
-        //         expression { env.BUILD_SERVICE2 == "true" }
-        //     }
-        //     steps {
-        //         script {
-        //             echo 'Building Docker Image for company...'
-        //             sh '''
-        //                 docker build -t nguyenhung1402/company_jenkins:${DOCKER_TAG} ./company
-        //                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-        //                 docker push nguyenhung1402/company_jenkins:${DOCKER_TAG}
-        //             '''
-        //         }
-        //     }
-        // }
+        stage('Build Docker Image for company') {
+            when {
+                expression { env.BUILD_SERVICE2 == "true" }
+            }
+            steps {
+                script {
+                    echo 'Building Docker Image for company...'
+                    sh '''
+                        docker build -t dangxuancuong/company_jenkins:${DOCKER_TAG} ./company
+                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                        docker push dangxuancuong/company_jenkins:${DOCKER_TAG}
+                    '''
+                }
+            }
+        }
         
         // stage('Build Docker Image for user') {
         //     when {
