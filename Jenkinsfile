@@ -71,67 +71,22 @@ pipeline {
                 }
             }
         }
-        stage('Run Tests Company') {
+        
+        stage('Build Docker Image for job') {
             when {
-                    expression { env.BUILD_SERVICE2 == "true" }
-                }
+                expression { env.BUILD_SERVICE1 == "true" }
+            }
             steps {
-
                 script {
-                    // Chạy lệnh test
-                    def testResult = sh(
-                        script: '''
-                            cd company
-                            npm ci
-                            npm run test
-                        ''', 
-                        returnStatus: true // Trả về mã thoát của lệnh
-                    )
-
-                    // Kiểm tra kết quả và thiết lập biến môi trường
-                    if (testResult == 0) {
-                        echo "Tests passed!"
-                        env.TEST_COMPANY_RESULT = "PASSED"
-                    } else {
-                        echo "Tests failed!"
-                        env.TEST_COMPANY_RESULT = "FAILED"
-                    }
+                    echo 'Building Docker Image for job...'
+                    sh '''
+                        docker build -t dangxuancuong/job_jenkins:${DOCKER_TAG} ./job
+                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                        docker push dangxuancuong/job_jenkins:${DOCKER_TAG}
+                    '''
                 }
             }
         }
-        stage('Post Results') {
-            when {
-                    allOf {
-                        expression { env.BUILD_SERVICE2 == "true" };
-                        expression { env.TEST_COMPANY_RESULT == "PASSED" }
-                    }
-                }
-            steps {
-                script {
-                    // Log kết quả test
-                    echo "Test result: ${env.TEST_COMPANY_RESULT}"
-
-                    // Lưu vào file nếu cần thiết
-                    writeFile file: 'test_result.txt', text: "Test result: ${env.TEST_COMPANY_RESULT}"
-                }
-            }
-        }
-        // Ở dưới không đụng đến
-        // stage('Build Docker Image for job') {
-        //     when {
-        //         expression { env.BUILD_SERVICE1 == "true" }
-        //     }
-        //     steps {
-        //         script {
-        //             echo 'Building Docker Image for job...'
-        //             sh '''
-        //                 docker build -t nguyenhung1402/job_jenkins:${DOCKER_TAG} ./job
-        //                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-        //                 docker push nguyenhung1402/job_jenkins:${DOCKER_TAG}
-        //             '''
-        //         }
-        //     }
-        // }
         
         stage('Build Docker Image for company') {
             when {
@@ -149,44 +104,44 @@ pipeline {
             }
         }
         
-        // stage('Build Docker Image for user') {
-        //     when {
-        //         expression { env.BUILD_SERVICE3 == "true" }
-        //     }
-        //     steps {
-        //         script {
-        //             echo 'Building Docker Image for user...'
-        //             sh '''
-        //                 docker build -t nguyenhung1402/user_jenkins:${DOCKER_TAG} ./user
-        //                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-        //                 docker push nguyenhung1402/user_jenkins:${DOCKER_TAG}
-        //             '''
-        //         }
-        //     }
-        // }
+        stage('Build Docker Image for user') {
+            when {
+                expression { env.BUILD_SERVICE3 == "true" }
+            }
+            steps {
+                script {
+                    echo 'Building Docker Image for user...'
+                    sh '''
+                        docker build -t dangxuancuong/user_jenkins:${DOCKER_TAG} ./user
+                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                        docker push dangxuancuong/user_jenkins:${DOCKER_TAG}
+                    '''
+                }
+            }
+        }
 
         // stage('test k8s') {
         //    agent {
         //         kubernetes {
-        //     yaml '''
-        //         apiVersion: v1
-        //         kind: Pod
-        //         spec:
-        //         containers:
-        //         - name: k8s
-        //             image: busybox
-        //             command:
-        //             - sh
-        //             - -c
-        //             - |
-        //             mkdir -p /usr/local/bin && \
-        //             wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
-        //             chmod +x /usr/local/bin/kubectl && \
-        //             sleep infinity
-        //             tty: true
-        //         restartPolicy: Never
-        //     '''
-        //     }
+        //             yaml '''
+        //                 apiVersion: v1
+        //                 kind: Pod
+        //                 spec:
+        //                 containers:
+        //                 - name: k8s
+        //                     image: busybox
+        //                     command:
+        //                     - sh
+        //                     - -c
+        //                     - |
+        //                     mkdir -p /usr/local/bin && \
+        //                     wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
+        //                     chmod +x /usr/local/bin/kubectl && \
+        //                     sleep infinity
+        //                     tty: true
+        //                 restartPolicy: Never
+        //             '''
+        //         }
         //     }
         //     stages {
         //         stage('Verify kubectl') {
@@ -198,7 +153,7 @@ pipeline {
         //         }
         //         stage('deploy user'){
         //             when {
-        //             expression { env.BUILD_SERVICE3 == "true" }
+        //                 expression { env.BUILD_SERVICE3 == "true" }
         //             }
         //             steps {
         //                 container('k8s') {
@@ -211,7 +166,7 @@ pipeline {
         //         }
         //         stage('deploy company'){
         //             when {
-        //             expression { env.BUILD_SERVICE2 == "true" }
+        //                 expression { env.BUILD_SERVICE2 == "true" }
         //             }
         //             steps {
         //                 container('k8s') {
@@ -224,7 +179,7 @@ pipeline {
         //         }
         //         stage('deploy job'){
         //             when {
-        //             expression { env.BUILD_SERVICE1 == "true" }
+        //                 expression { env.BUILD_SERVICE1 == "true" }
         //             }
         //             steps {
         //                 container('k8s') {
@@ -235,8 +190,8 @@ pipeline {
         //                 }
         //             }
         //         }
-
-
+                
+                
         //     }
         // }
     }
