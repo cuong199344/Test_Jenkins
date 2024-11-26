@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 import xss from "xss-clean";
 import mongoSanitize from "express-mongo-sanitize";
 
-import dbConnection from "./dbConfig/dbConnection.js";
+
 import router from "./routes/index.js";
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 
@@ -16,8 +16,6 @@ dotenv.config();
 const app = express();
 
 
-// MONGODB CONNECTION
-dbConnection();
 
 // middlenames
 app.use(cors());
