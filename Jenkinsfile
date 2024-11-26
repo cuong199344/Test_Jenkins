@@ -8,28 +8,20 @@ pipeline {
     }
 
     stages {
-        stage('Push test') {
-            when {
-                branch "deb"
-            }
-            stages{
-                stage('Checkout'){
-                steps {
-                    script {
-                        // Checkout code từ GitHub repository sử dụng Jenkins GitSCM
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: [[name: '*/master']],
-                            userRemoteConfigs: [[
-                                url: 'https://github.com/cuong199344/Test_Jenkins.git',
-                                credentialsId: GIT_CREDENTIALS_ID
-                            ]]
-                        ])
-                    }
-                }
+        stage('Checkout') {
+            steps {
+                script {
+                    // Checkout code từ GitHub repository sử dụng Jenkins GitSCM
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/master']],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/cuong199344/Test_Jenkins.git',
+                            credentialsId: GIT_CREDENTIALS_ID
+                        ]]
+                    ])
                 }
             }
-
         }
         
         stage('Generate Docker Tag') {
