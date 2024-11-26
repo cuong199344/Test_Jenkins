@@ -99,6 +99,9 @@ pipeline {
             }
         }
         stage('Post Results') {
+            when {
+                    expression { env.TEST_COMPANY_RESULT = "PASSED" }
+                }
             steps {
                 script {
                     // Log kết quả test
