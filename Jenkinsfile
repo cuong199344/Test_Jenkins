@@ -101,7 +101,7 @@ pipeline {
         stage('Post Results') {
             when {
                     expression { env.BUILD_SERVICE2 == "true" }
-                    expression { env.TEST_COMPANY_RESULT = "PASSED" }
+                    expression { env.TEST_COMPANY_RESULT == "PASSED" }
                 }
             steps {
                 script {
