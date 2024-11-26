@@ -74,7 +74,8 @@ pipeline {
         stage('Run Tests Company') {
             steps {
                 when {
-                    expression { env.BUILD_SERVICE2 == "true" }
+                    environment name: BUILD_SERVICE2,
+                    value: 'true'
                 }
                 script {
                     // Chạy lệnh test
