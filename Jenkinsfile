@@ -80,9 +80,9 @@ pipeline {
                 script {
                     echo 'Building Docker Image for job...'
                     sh '''
-                        docker build -t dangxuancuong/job_jenkins:${DOCKER_TAG} ./job
+                        docker build -t dangxuancuong/job_jenkins_test:${DOCKER_TAG} ./job
                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push dangxuancuong/job_jenkins:${DOCKER_TAG}
+                        docker push dangxuancuong/job_jenkins_test:${DOCKER_TAG}
                     '''
                 }
             }
@@ -96,9 +96,9 @@ pipeline {
                 script {
                     echo 'Building Docker Image for company...'
                     sh '''
-                        docker build -t dangxuancuong/company_jenkins:${DOCKER_TAG} ./company
+                        docker build -t dangxuancuong/company_jenkins_test:${DOCKER_TAG} ./company
                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push dangxuancuong/company_jenkins:${DOCKER_TAG}
+                        docker push dangxuancuong/company_jenkins_test:${DOCKER_TAG}
                     '''
                 }
             }
@@ -112,9 +112,9 @@ pipeline {
                 script {
                     echo 'Building Docker Image for user...'
                     sh '''
-                        docker build -t dangxuancuong/user_jenkins:${DOCKER_TAG} ./user
+                        docker build -t dangxuancuong/user_jenkins_test:${DOCKER_TAG} ./user
                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push dangxuancuong/user_jenkins:${DOCKER_TAG}
+                        docker push dangxuancuong/user_jenkins_test:${DOCKER_TAG}
                     '''
                 }
             }
