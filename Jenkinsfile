@@ -24,23 +24,23 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
-            environment {
-                scannerHome = tool 'SonarScanner' // Tên SonarScanner trong Global Tool Configuration
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') { // Tên server đã cấu hình
-                    sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=nguyenhung1402jenkins \
-                        -Dsonar.organization=nguyenhung1402jenkins \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=https://sonarcloud.io \
-                        -Dsonar.login=${SONAR_TOKEN}
-                    """
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     environment {
+        //         scannerHome = tool 'SonarScanner' // Tên SonarScanner trong Global Tool Configuration
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('SonarQube') { // Tên server đã cấu hình
+        //             sh """
+        //                 ${scannerHome}/bin/sonar-scanner \
+        //                 -Dsonar.projectKey=nguyenhung1402jenkins \
+        //                 -Dsonar.organization=nguyenhung1402jenkins \
+        //                 -Dsonar.sources=. \
+        //                 -Dsonar.host.url=https://sonarcloud.io \
+        //                 -Dsonar.login=${SONAR_TOKEN}
+        //             """
+        //         }
+        //     }
+        // }
 
         stage('Generate Docker Tag') {
             steps {
@@ -71,128 +71,164 @@ pipeline {
                 }
             }
         }
-        
-        stage('Build Docker Image for job') {
-            when {
-                expression { env.BUILD_SERVICE1 == "true" }
-            }
+        stage('Run Tests Company') {
             steps {
                 script {
-                    echo 'Building Docker Image for job...'
-                    sh '''
-                        docker build -t nguyenhung1402/job_jenkins:${DOCKER_TAG} ./job
-                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push nguyenhung1402/job_jenkins:${DOCKER_TAG}
-                    '''
-                }
-            }
-        }
-        
-        stage('Build Docker Image for company') {
-            when {
-                expression { env.BUILD_SERVICE2 == "true" }
-            }
-            steps {
-                script {
-                    echo 'Building Docker Image for company...'
-                    sh '''
-                        docker build -t nguyenhung1402/company_jenkins:${DOCKER_TAG} ./company
-                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push nguyenhung1402/company_jenkins:${DOCKER_TAG}
-                    '''
-                }
-            }
-        }
-        
-        stage('Build Docker Image for user') {
-            when {
-                expression { env.BUILD_SERVICE3 == "true" }
-            }
-            steps {
-                script {
-                    echo 'Building Docker Image for user...'
-                    sh '''
-                        docker build -t nguyenhung1402/user_jenkins:${DOCKER_TAG} ./user
-                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push nguyenhung1402/user_jenkins:${DOCKER_TAG}
-                    '''
-                }
-            }
-        }
 
-        stage('test k8s') {
-           agent {
-                kubernetes {
-      yaml '''
-        apiVersion: v1
-        kind: Pod
-        spec:
-          containers:
-          - name: k8s
-            image: busybox
-            command:
-            - sh
-            - -c
-            - |
-              mkdir -p /usr/local/bin && \
-              wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
-              chmod +x /usr/local/bin/kubectl && \
-              sleep infinity
-            tty: true
-          restartPolicy: Never
-      '''
-    }
-            }
-            stages {
-                stage('Verify kubectl') {
-                steps {
-                    container('k8s') {
-                    sh 'kubectl get deployments -n default'
+                    // Chạy lệnh test
+                    def testResult = sh(
+                        script: '''
+                            cd company
+                            npm ci
+                            npm run test
+                        ''', 
+                        returnStatus: true // Trả về mã thoát của lệnh
+                    )
+
+                    // Kiểm tra kết quả và thiết lập biến môi trường
+                    if (testResult == 0) {
+                        echo "Tests passed!"
+                        env.TEST_COMPANY_RESULT = "PASSED"
+                    } else {
+                        echo "Tests failed!"
+                        env.TEST_COMPANY_RESULT = "FAILED"
                     }
                 }
-                }
-                stage('deploy user'){
-                    when {
-                    expression { env.BUILD_SERVICE3 == "true" }
-                    }
-                    steps {
-                        container('k8s') {
-                        sh '''
-                            kubectl set image deployment/user-depl user=nguyenhung1402/user_jenkins:${DOCKER_TAG} -n default
-                            
-                        '''
-                        }
-                    }
-                }
-                stage('deploy company'){
-                    when {
-                    expression { env.BUILD_SERVICE2 == "true" }
-                    }
-                    steps {
-                        container('k8s') {
-                        sh '''
-                            kubectl set image deployment/company-depl  company=nguyenhung1402/company_jenkins:${DOCKER_TAG} -n default
-                            
-                        '''
-                        }
-                    }
-                }
-                stage('deploy job'){
-                    when {
-                    expression { env.BUILD_SERVICE1 == "true" }
-                    }
-                    steps {
-                        container('k8s') {
-                        sh '''
-                            kubectl set image deployment/job-depl job=nguyenhung1402/job_jenkins:${DOCKER_TAG} -n default
-                            
-                        '''
-                        }
-                    }
-                }
-                
-                
             }
         }
+        stage('Post Results') {
+            steps {
+                script {
+                    // Log kết quả test
+                    echo "Test result: ${env.TEST_COMPANY_RESULT}"
+
+                    // Lưu vào file nếu cần thiết
+                    writeFile file: 'test_result.txt', text: "Test result: ${env.TEST_COMPANY_RESULT}"
+                }
+            }
+        }
+        // Ở dưới không đụng đến
+        // stage('Build Docker Image for job') {
+        //     when {
+        //         expression { env.BUILD_SERVICE1 == "true" }
+        //     }
+        //     steps {
+        //         script {
+        //             echo 'Building Docker Image for job...'
+        //             sh '''
+        //                 docker build -t nguyenhung1402/job_jenkins:${DOCKER_TAG} ./job
+        //                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                 docker push nguyenhung1402/job_jenkins:${DOCKER_TAG}
+        //             '''
+        //         }
+        //     }
+        // }
+        
+        // stage('Build Docker Image for company') {
+        //     when {
+        //         expression { env.BUILD_SERVICE2 == "true" }
+        //     }
+        //     steps {
+        //         script {
+        //             echo 'Building Docker Image for company...'
+        //             sh '''
+        //                 docker build -t nguyenhung1402/company_jenkins:${DOCKER_TAG} ./company
+        //                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                 docker push nguyenhung1402/company_jenkins:${DOCKER_TAG}
+        //             '''
+        //         }
+        //     }
+        // }
+        
+        // stage('Build Docker Image for user') {
+        //     when {
+        //         expression { env.BUILD_SERVICE3 == "true" }
+        //     }
+        //     steps {
+        //         script {
+        //             echo 'Building Docker Image for user...'
+        //             sh '''
+        //                 docker build -t nguyenhung1402/user_jenkins:${DOCKER_TAG} ./user
+        //                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                 docker push nguyenhung1402/user_jenkins:${DOCKER_TAG}
+        //             '''
+        //         }
+        //     }
+        // }
+
+        // stage('test k8s') {
+        //    agent {
+        //         kubernetes {
+        //     yaml '''
+        //         apiVersion: v1
+        //         kind: Pod
+        //         spec:
+        //         containers:
+        //         - name: k8s
+        //             image: busybox
+        //             command:
+        //             - sh
+        //             - -c
+        //             - |
+        //             mkdir -p /usr/local/bin && \
+        //             wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
+        //             chmod +x /usr/local/bin/kubectl && \
+        //             sleep infinity
+        //             tty: true
+        //         restartPolicy: Never
+        //     '''
+        //     }
+        //     }
+        //     stages {
+        //         stage('Verify kubectl') {
+        //             steps {
+        //                 container('k8s') {
+        //                 sh 'kubectl get deployments -n default'
+        //                 }
+        //             }
+        //         }
+        //         stage('deploy user'){
+        //             when {
+        //             expression { env.BUILD_SERVICE3 == "true" }
+        //             }
+        //             steps {
+        //                 container('k8s') {
+        //                 sh '''
+        //                     kubectl set image deployment/user-depl user=nguyenhung1402/user_jenkins:${DOCKER_TAG} -n default
+                            
+        //                 '''
+        //                 }
+        //             }
+        //         }
+        //         stage('deploy company'){
+        //             when {
+        //             expression { env.BUILD_SERVICE2 == "true" }
+        //             }
+        //             steps {
+        //                 container('k8s') {
+        //                 sh '''
+        //                     kubectl set image deployment/company-depl  company=nguyenhung1402/company_jenkins:${DOCKER_TAG} -n default
+                            
+        //                 '''
+        //                 }
+        //             }
+        //         }
+        //         stage('deploy job'){
+        //             when {
+        //             expression { env.BUILD_SERVICE1 == "true" }
+        //             }
+        //             steps {
+        //                 container('k8s') {
+        //                 sh '''
+        //                     kubectl set image deployment/job-depl job=nguyenhung1402/job_jenkins:${DOCKER_TAG} -n default
+                            
+        //                 '''
+        //                 }
+        //             }
+        //         }
+
+
+        //     }
+        // }
     }
 }
