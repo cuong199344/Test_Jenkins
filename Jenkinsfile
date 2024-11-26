@@ -72,10 +72,11 @@ pipeline {
             }
         }
         stage('Run Tests Company') {
-            steps {
-                when {
+            when {
                     expression { env.BUILD_SERVICE2 == "true" }
                 }
+            steps {
+
                 script {
                     // Chạy lệnh test
                     def testResult = sh(
