@@ -74,8 +74,7 @@ pipeline {
         stage('Run Tests Company') {
             steps {
                 when {
-                    environment name: BUILD_SERVICE2,
-                    value: 'true'
+                    expression { env.BUILD_SERVICE2 == "true" }
                 }
                 script {
                     // Chạy lệnh test
@@ -99,23 +98,23 @@ pipeline {
                 }
             }
         }
-        stage('Post Results') {
-            when {
-                    allOf {
-                        expression { env.BUILD_SERVICE2 == "true" }
-                        expression { env.TEST_COMPANY_RESULT == "PASSED" }
-                    }
-                }
-            steps {
-                script {
-                    // Log kết quả test
-                    echo "Test result: ${env.TEST_COMPANY_RESULT}"
+        // stage('Post Results') {
+        //     when {
+        //             allOf {
+        //                 expression { env.BUILD_SERVICE2 == "true" }
+        //                 expression { env.TEST_COMPANY_RESULT == "PASSED" }
+        //             }
+        //         }
+        //     steps {
+        //         script {
+        //             // Log kết quả test
+        //             echo "Test result: ${env.TEST_COMPANY_RESULT}"
 
-                    // Lưu vào file nếu cần thiết
-                    writeFile file: 'test_result.txt', text: "Test result: ${env.TEST_COMPANY_RESULT}"
-                }
-            }
-        }
+        //             // Lưu vào file nếu cần thiết
+        //             writeFile file: 'test_result.txt', text: "Test result: ${env.TEST_COMPANY_RESULT}"
+        //         }
+        //     }
+        // }
         // Ở dưới không đụng đến
         // stage('Build Docker Image for job') {
         //     when {
