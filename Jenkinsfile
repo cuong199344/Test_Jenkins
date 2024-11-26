@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
+        // DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
-        SONAR_TOKEN = credentials('sonar-token-id')
+        // SONAR_TOKEN = credentials('sonar-token-id')
     }
 
     stages {
@@ -16,7 +16,7 @@ pipeline {
                         $class: 'GitSCM',
                         branches: [[name: '*/master']],
                         userRemoteConfigs: [[
-                            url: 'https://github.com/nguyenhung1402/repo_dev.git',
+                            url: 'https://github.com/cuong199344/Test_Jenkins.git',
                             credentialsId: GIT_CREDENTIALS_ID
                         ]]
                     ])
@@ -42,17 +42,17 @@ pipeline {
         //     }
         // }
 
-        stage('Generate Docker Tag') {
-            steps {
-                script {
-                    // Sử dụng commit hash và timestamp để tạo Docker tag
-                    def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                    def timestamp = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
-                    env.DOCKER_TAG = "${commitHash}-${timestamp}"
-                    echo "Generated Docker Tag: ${env.DOCKER_TAG}"
-                }
-            }
-        }
+        // stage('Generate Docker Tag') {
+        //     steps {
+        //         script {
+        //             // Sử dụng commit hash và timestamp để tạo Docker tag
+        //             def commitHash = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+        //             def timestamp = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
+        //             env.DOCKER_TAG = "${commitHash}-${timestamp}"
+        //             echo "Generated Docker Tag: ${env.DOCKER_TAG}"
+        //         }
+        //     }
+        // }
 
         stage('Determine Changed Folder') {
             steps {
