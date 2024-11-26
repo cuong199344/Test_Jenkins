@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Push test') {
             when {
-                branches "deb"
+                branch "deb"
             }
             stages{
                 stage('Checkout'){
