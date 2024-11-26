@@ -81,9 +81,8 @@ pipeline {
                     // Chạy lệnh test
                     def testResult = sh(
                         script: '''
-                            cd company
-                            npm ci
-                            npm run test
+                            npm ci /company
+                            npm run test /company
                         ''', 
                         returnStatus: true // Trả về mã thoát của lệnh
                     )
