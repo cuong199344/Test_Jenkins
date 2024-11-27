@@ -73,9 +73,9 @@ pipeline {
         }
         
         stage('Deb change'){
-            when{
-                branch 'deb'
-            }
+            // when{
+            //     branch 'deb'
+            // }
             stages{
                 stage('Test company') {
                     when {
