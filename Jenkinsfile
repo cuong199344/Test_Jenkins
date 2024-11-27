@@ -192,9 +192,9 @@ pipeline {
                     steps{
                         script{
                             sh '''
-                                docker pull dangxuancuong/job_jenkins:latest
-                                docker pull dangxuancuong/company_jenkins:latestt
-                                docker pull dangxuancuong/user_jenkins:latest
+                                docker pull dangxuancuong/job_jenkins
+                                docker pull dangxuancuong/company_jenkins
+                                docker pull dangxuancuong/user_jenkins
 
                                 docker-compose up -d
 
@@ -202,9 +202,9 @@ pipeline {
 
                                 docker-compose down
 
-                                docker rmi dangxuancuong/job_jenkins:latest
-                                docker rmi dangxuancuong/company_jenkins:latest
-                                docker rmi dangxuancuong/user_jenkins:latest
+                                docker rmi dangxuancuong/job_jenkins
+                                docker rmi dangxuancuong/company_jenkins
+                                docker rmi dangxuancuong/user_jenkins
                             '''
                         }
                     }
