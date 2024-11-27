@@ -199,7 +199,25 @@ pipeline {
                                 docker-compose up -d
 
                                 docker ps
+                            '''
+                            def response = sh(
+                                script: '''
+                                    curl -s -d '{"name":"Cuong Tech", "email":"cuongtech2@gmail.com", "password":"123456"}' \
+                                    -H "Content-Type: application/json" \
+                                    -X POST http://localhost:8802/company/api-v1/companies/register
+                                ''',
+                                returnStdout: true // Lấy kết quả trả về từ lệnh curl
+                            ).trim()
+                    
+                            echo "Response: ${response}"
+                        }
+                    }
+                }
 
+                stage('Delete docker-compose'){
+                    steps{
+                        script{
+                            sh '''
                                 docker-compose down
 
                                 docker rmi dangxuancuong/job_jenkins
