@@ -2,6 +2,9 @@ pipeline {
     agent any
     
     environment {
+        JOB_IMAGE = 'dangxuancuong/job_jenkins:latest'
+        USER_IMAGE = 'dangxuancuong/user_jenkins:latest'
+        COMPANY_IMAGE = 'dangxuancuong/company_jenkins:latest'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
