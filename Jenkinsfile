@@ -192,15 +192,23 @@ pipeline {
                     steps{
                         script{
                             sh '''
-                                JOB_IMAGE="dangxuancuong/job_jenkins:latest"
-                                USER_IMAGE="dangxuancuong/user_jenkins:latest"
-                                COMPANY_IMAGE="dangxuancuong/company_jenkins:latest"
+                                docker rmi dangxuancuong/job_jenkins:latest
+                                docker rmi dangxuancuong/company_jenkins:latest
+                                docker rmi dangxuancuong/user_jenkins:latest
+
+                                docker pull dangxuancuong/job_jenkins:latest
+                                docker pull dangxuancuong/company_jenkins:latestt
+                                docker pull dangxuancuong/user_jenkins:latest
 
                                 docker-compose up -d
 
                                 docker ps
 
                                 docker-compose down
+
+                                docker rmi dangxuancuong/job_jenkins:latest
+                                docker rmi dangxuancuong/company_jenkins:latest
+                                docker rmi dangxuancuong/user_jenkins:latest
                             '''
                         }
                     }
