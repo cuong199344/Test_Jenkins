@@ -142,9 +142,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for job...'
                             sh '''
-                                docker build -t dangxuancuong/job_jenkins ./job
+                                docker build -t dangxuancuong/job_jenkins_test:${DOCKER_TAG} ./job
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/job_jenkins
+                                docker push dangxuancuong/job_jenkins_test:${DOCKER_TAG}
                             '''
                         }
                     }
@@ -161,9 +161,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for company...'
                             sh '''
-                                docker build -t dangxuancuong/company_jenkins ./company
+                                docker build -t dangxuancuong/company_jenkins_test:${DOCKER_TAG} ./company
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/company_jenkins
+                                docker push dangxuancuong/company_jenkins_test:${DOCKER_TAG}
                             '''
                         }
                     }
@@ -181,9 +181,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for user...'
                             sh '''
-                                docker build -t dangxuancuong/user_jenkins ./user
+                                docker build -t dangxuancuong/user_jenkins_test:${DOCKER_TAG} ./user
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/user_jenkins
+                                docker push dangxuancuong/user_jenkins_test:${DOCKER_TAG}
                             '''
                         }
                     }
@@ -203,9 +203,7 @@ pipeline {
                             '''
                             def response = sh(
                                 script: '''
-                                    curl -s -d '{"name":"Cuong Tech", "email":"cuongtech2@gmail.com", "password":"123456"}' \
-                                    -H "Content-Type: application/json" \
-                                    -X POST http://localhost:8802/company/api-v1/companies/register
+                                    curl -I http://localhost:8802/company/api-v1/companies/register
                                 ''',
                                 returnStdout: true // Lấy kết quả trả về từ lệnh curl và hiển thị lên
                             ).trim()
