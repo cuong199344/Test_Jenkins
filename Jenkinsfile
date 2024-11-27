@@ -14,7 +14,7 @@ pipeline {
                     // Checkout code từ GitHub repository sử dụng Jenkins GitSCM
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/deb]],
+                        branches: [[name: '*/deb']],
                         userRemoteConfigs: [[
                             url: 'https://github.com/cuong199344/Test_Jenkins.git',
                             credentialsId: GIT_CREDENTIALS_ID
