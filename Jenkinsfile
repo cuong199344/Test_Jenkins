@@ -17,7 +17,7 @@ pipeline {
                     // Checkout code từ GitHub repository sử dụng Jenkins GitSCM
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/deb']],
+                        branches: [[name: '*/master']],
                         userRemoteConfigs: [[
                             url: 'https://github.com/cuong199344/Test_Jenkins.git',
                             credentialsId: GIT_CREDENTIALS_ID
@@ -76,9 +76,9 @@ pipeline {
         }
         
         stage('Deb change'){
-            when{
-                branch 'deb'
-            }
+            // when{
+            //     branch 'deb'
+            // }
             stages{
                 stage('Test company') {
                     when {
@@ -142,9 +142,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for job...'
                             sh '''
-                                docker build -t dangxuancuong/job_jenkins_test:${DOCKER_TAG} ./job
+                                docker build -t dangxuancuong/job_jenkins ./job
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/job_jenkins_test:${DOCKER_TAG}
+                                docker push dangxuancuong/job_jenkins
                             '''
                         }
                     }
@@ -161,9 +161,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for company...'
                             sh '''
-                                docker build -t dangxuancuong/company_jenkins_test:${DOCKER_TAG} ./company
+                                docker build -t dangxuancuong/company_jenkins ./company
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/company_jenkins_test:${DOCKER_TAG}
+                                docker push dangxuancuong/company_jenkins
                             '''
                         }
                     }
@@ -181,9 +181,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for user...'
                             sh '''
-                                docker build -t dangxuancuong/user_jenkins_test:${DOCKER_TAG} ./user
+                                docker build -t dangxuancuong/user_jenkins ./user
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/user_jenkins_test:${DOCKER_TAG}
+                                docker push dangxuancuong/user_jenkins
                             '''
                         }
                     }
@@ -191,6 +191,7 @@ pipeline {
                 stage('Test run docker-compose'){
                     steps{
                         script{
+
                             sh '''
                                 docker pull dangxuancuong/job_jenkins
                                 docker pull dangxuancuong/company_jenkins
@@ -206,6 +207,8 @@ pipeline {
                                 docker rmi dangxuancuong/company_jenkins
                                 docker rmi dangxuancuong/user_jenkins
                             '''
+
+
                         }
                     }
                 }
