@@ -224,6 +224,7 @@ pipeline {
                                 docker rmi dangxuancuong/job_jenkins
                                 docker rmi dangxuancuong/company_jenkins
                                 docker rmi dangxuancuong/user_jenkins
+                                docker rm -f mongo1 mongo2 mongo3
                             '''
 
 
