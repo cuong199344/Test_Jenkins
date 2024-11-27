@@ -2,6 +2,9 @@ pipeline {
     agent any
     
     environment {
+        JOB_IMAGE = 'dangxuancuong/job_jenkins'
+        USER_IMAGE = 'dangxuancuong/user_jenkins'
+        COMPANY_IMAGE = 'dangxuancuong/company_jenkins'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -188,6 +191,23 @@ pipeline {
                 stage('Test run docker-compose'){
                     steps{
                         script{
+
+                            sh '''
+                                docker pull dangxuancuong/job_jenkins
+                                docker pull dangxuancuong/company_jenkins
+                                docker pull dangxuancuong/user_jenkins
+
+                                docker-compose up -d
+
+                                docker ps
+
+                                docker-compose down
+
+                                docker rmi dangxuancuong/job_jenkins
+                                docker rmi dangxuancuong/company_jenkins
+                                docker rmi dangxuancuong/user_jenkins
+                            '''
+
 
                         }
                     }
