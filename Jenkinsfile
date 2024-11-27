@@ -89,7 +89,7 @@ pipeline {
                             def testResult = sh(
                                 script: '''
                                     cd company
-                                    npm ci
+                                    npm install
                                     npm run test
                                 ''', 
                                 returnStatus: true // Trả về mã thoát của lệnh
@@ -116,7 +116,7 @@ pipeline {
                             def testResult = sh(
                                 script: '''
                                     cd user
-                                    npm ci
+                                    npm install
                                     npm run test
                                 ''', 
                                 returnStatus: true // Trả về mã thoát của lệnh
