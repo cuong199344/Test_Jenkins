@@ -14,7 +14,7 @@ pipeline {
                     // Checkout code từ GitHub repository sử dụng Jenkins GitSCM
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/master']],
+                        branches: [[name: '*/deb]],
                         userRemoteConfigs: [[
                             url: 'https://github.com/cuong199344/Test_Jenkins.git',
                             credentialsId: GIT_CREDENTIALS_ID
@@ -72,55 +72,144 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image for job') {
-            when {
-                expression { env.BUILD_SERVICE1 == "true" }
+        stage('Deb change'){
+            when{
+                branch 'deb'
             }
-            steps {
-                script {
-                    echo 'Building Docker Image for job...'
-                    sh '''
-                        docker build -t dangxuancuong/job_jenkins:${DOCKER_TAG} ./job
-                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push dangxuancuong/job_jenkins:${DOCKER_TAG}
-                    '''
+            stages{
+                stage('Test company') {
+                    when {
+                        expression { env.BUILD_SERVICE2 == "true" }
+                    }
+                    steps {
+                        script {
+                            def testResult = sh(
+                                script: '''
+                                    cd company
+                                    npm ci
+                                    npm run test
+                                ''', 
+                                returnStatus: true // Trả về mã thoát của lệnh
+                            )
+
+                            // Kiểm tra kết quả và thiết lập biến môi trường
+                            if (testResult == 0) {
+                                echo "Tests passed!"
+                                env.TEST_COMPANY_RESULT = "PASSED"
+                            } else {
+                                echo "Tests failed!"
+                                env.TEST_COMPANY_RESULT = "FAILED"
+                            }
+                        }
+                    }
                 }
-            }
-        }
+
+                stage('Test user') {
+                    when {
+                        expression { env.BUILD_SERVICE3 == "true" }
+                    }
+                    steps {
+                        script {
+                            def testResult = sh(
+                                script: '''
+                                    cd user
+                                    npm ci
+                                    npm run test
+                                ''', 
+                                returnStatus: true // Trả về mã thoát của lệnh
+                            )
+
+                            // Kiểm tra kết quả và thiết lập biến môi trường
+                            if (testResult == 0) {
+                                echo "Tests passed!"
+                                env.TEST_USER_RESULT = "PASSED"
+                            } else {
+                                echo "Tests failed!"
+                                env.TEST_USER_RESULT = "FAILED"
+                            }
+                        }
+                    }
+                }
+
+                stage('Build Docker Image for job') {
+                    when {
+                        expression { env.BUILD_SERVICE1 == "true" }
+                    }
+                    steps {
+                        script {
+                            echo 'Building Docker Image for job...'
+                            sh '''
+                                docker build -t dangxuancuong/job_jenkins_test:${DOCKER_TAG} ./job
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/job_jenkins_test:${DOCKER_TAG}
+                            '''
+                        }
+                    }
+                }
         
-        stage('Build Docker Image for company') {
-            when {
-                expression { env.BUILD_SERVICE2 == "true" }
-            }
-            steps {
-                script {
-                    echo 'Building Docker Image for company...'
-                    sh '''
-                        docker build -t dangxuancuong/company_jenkins:${DOCKER_TAG} ./company
-                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push dangxuancuong/company_jenkins:${DOCKER_TAG}
-                    '''
+                stage('Build Docker Image for company') {
+                    when {
+                        allOf {
+                            expression { env.BUILD_SERVICE2 == "true" };
+                            expression { env.TEST_COMPANY_RESULT == "PASSED" }
+                        }
+                    }
+                    steps {
+                        script {
+                            echo 'Building Docker Image for company...'
+                            sh '''
+                                docker build -t dangxuancuong/company_jenkins_test:${DOCKER_TAG} ./company
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/company_jenkins_test:${DOCKER_TAG}
+                            '''
+                        }
+                    }
                 }
-            }
-        }
-        
-        stage('Build Docker Image for user') {
-            when {
-                expression { env.BUILD_SERVICE3 == "true" }
-            }
-            steps {
-                script {
-                    echo 'Building Docker Image for user...'
-                    sh '''
-                        docker build -t dangxuancuong/user_jenkins:${DOCKER_TAG} ./user
-                        docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                        docker push dangxuancuong/user_jenkins:${DOCKER_TAG}
-                    '''
+                
+                stage('Build Docker Image for user') {
+                    when {
+                        allOf {
+                            expression { env.BUILD_SERVICE3 == "true" };
+                            expression { env.TEST_USER_RESULT == "PASSED" }
+                        }
+                
+                    }
+                    steps {
+                        script {
+                            echo 'Building Docker Image for user...'
+                            sh '''
+                                docker build -t dangxuancuong/user_jenkins_test:${DOCKER_TAG} ./user
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/user_jenkins_test:${DOCKER_TAG}
+                            '''
+                        }
+                    }
                 }
+                stage('Test run docker-compose'){
+                    steps{
+                        script{
+                            sh '''
+                                JOB_IMAGE="dangxuancuong/job_jenkins:latest"
+                                USER_IMAGE="dangxuancuong/user_jenkins:latest"
+                                COMPANY_IMAGE="dangxuancuong/company_jenkins:latest"
+
+                                docker-compose up -d
+
+                                docker ps
+
+                                docker-compose down
+                            '''
+                        }
+                    }
+                }
+                
             }
         }
 
         // stage('test k8s') {
+        //     when{
+        //         branch 'master'
+        //     }
         //    agent {
         //         kubernetes {
         //             yaml '''
@@ -189,9 +278,7 @@ pipeline {
         //                 '''
         //                 }
         //             }
-        //         }
-                
-                
+        //         }   
         //     }
         // }
     }
