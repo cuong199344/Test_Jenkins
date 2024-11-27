@@ -185,23 +185,13 @@ pipeline {
                         }
                     }
                 }
-                // stage('Test run docker-compose'){
-                //     steps{
-                //         script{
-                //             sh '''
-                //                 JOB_IMAGE="dangxuancuong/job_jenkins"
-                //                 USER_IMAGE="dangxuancuong/user_jenkins:latest"
-                //                 COMPANY_IMAGE="dangxuancuong/company_jenkins:latest"
+                stage('Test run docker-compose'){
+                    steps{
+                        script{
 
-                //                 docker-compose up -d
-
-                //                 docker ps
-
-                //                 docker-compose down
-                //             '''
-                //         }
-                //     }
-                // }
+                        }
+                    }
+                }
                 
             }
         }
