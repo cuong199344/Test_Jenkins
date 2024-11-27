@@ -98,15 +98,15 @@ pipeline {
             }
         }
 
-        stage('Test company') {
+        stage('Test user') {
             when {
-                expression { env.BUILD_SERVICE2 == "true" }
+                expression { env.BUILD_SERVICE3 == "true" }
             }
             steps {
                 script {
                     def testResult = sh(
                         script: '''
-                            cd company
+                            cd user
                             npm ci
                             npm run test
                         ''', 
@@ -116,10 +116,10 @@ pipeline {
                     // Kiểm tra kết quả và thiết lập biến môi trường
                     if (testResult == 0) {
                         echo "Tests passed!"
-                        env.TEST_COMPANY_RESULT = "PASSED"
+                        env.TEST_USER_RESULT = "PASSED"
                     } else {
                         echo "Tests failed!"
-                        env.TEST_COMPANY_RESULT = "FAILED"
+                        env.TEST_USER_RESULT = "FAILED"
                     }
                 }
             }
@@ -162,7 +162,10 @@ pipeline {
         
         stage('Build Docker Image for user') {
             when {
-                expression { env.BUILD_SERVICE3 == "true" }
+                allOf {
+                    expression { env.BUILD_SERVICE3 == "true" };
+                    expression { env.TEST_USER_RESULT == "PASSED" }
+                }
             }
             steps {
                 script {
