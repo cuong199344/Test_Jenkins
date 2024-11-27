@@ -4,7 +4,7 @@ import dbConnection from "./dbConfig/dbConnection.js";
 // MONGODB CONNECTION
 dbConnection();
 
-const PORT = process.env.PORT || 8801;
+const PORT = process.env.PORT || 8800;
 
 const server = app.listen(PORT, () => {
   console.log(`Dev Server running on port!!!!: ${PORT}`);
