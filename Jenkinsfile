@@ -207,7 +207,7 @@ pipeline {
                                     -H "Content-Type: application/json" \
                                     -X POST http://localhost:8802/company/api-v1/companies/register
                                 ''',
-                                returnStdout: true // Lấy kết quả trả về từ lệnh curl
+                                returnStdout: true // Lấy kết quả trả về từ lệnh curl và hiển thị lên
                             ).trim()
                     
                             echo "Response: ${response}"
@@ -226,8 +226,6 @@ pipeline {
                                 docker rmi dangxuancuong/user_jenkins
                                 docker rm -f mongo1 mongo2 mongo3
                             '''
-
-
                         }
                     }
                 }
