@@ -1,0 +1,397 @@
+{
+	"info": {
+		"_postman_id": "684eacdf-3c27-43e4-ad30-c3cf29f1efba",
+		"name": "JobFinder",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30978066",
+		"_collection_link": "https://jobfinder-4445.postman.co/workspace/JobFinder-Workspace~b067b4fb-9fdf-48c7-815c-3a11e214916a/collection/30978066-684eacdf-3c27-43e4-ad30-c3cf29f1efba?action=share&source=collection_link&creator=30978066"
+	},
+	"item": [
+		{
+			"name": "registerUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Tester\",\r\n    \"lastName\": \"Doing\",\r\n    \"email\": \"tester123@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8800/api-v1/users/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8800",
+					"path": [
+						"api-v1",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signinUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseData = pm.response.json();\r",
+							"\r",
+							"pm.environment.set(\"userToken\", `Bearer ${responseData.token}`);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"tester123@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8800/api-v1/users/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8800",
+					"path": [
+						"api-v1",
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUser",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{userToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8800/api-v1/users/get-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8800",
+					"path": [
+						"api-v1",
+						"users",
+						"get-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateUser",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{userToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Tester Update\",\r\n    \"lastName\": \"Doing Update\",\r\n    \"email\": \"testerupdate@gmail.com\",\r\n    \"contact\": \"123456\",\r\n    \"location\": \"VN\",\r\n    \"profileUrl\": \"image\",\r\n    \"jobTitle\": \"testing\",\r\n    \"about\": \"testing\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8800/api-v1/users/update-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8800",
+					"path": [
+						"api-v1",
+						"users",
+						"update-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "registerCompany",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Testing\",\r\n    \"email\": \"test@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8802/api-v1/companies/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8802",
+					"path": [
+						"api-v1",
+						"companies",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signinCompany",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let responseData = pm.response;\r",
+							"console.log(\"Token saved:\", responseData);\r",
+							"pm.environment.get(\"variable_key\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const responseData = pm.response.json();\r",
+							"\r",
+							"pm.environment.set(\"companyToken\", `Bearer ${responseData.token}`);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"test@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8802/api-v1/companies/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8802",
+					"path": [
+						"api-v1",
+						"companies",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getProfileCompany",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{companyToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8802/api-v1/companies/get-company-profile",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8802",
+					"path": [
+						"api-v1",
+						"companies",
+						"get-company-profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getCompany",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8802/api-v1/companies/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8802",
+					"path": [
+						"api-v1",
+						"companies",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateCompany",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{companyToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Test Update Test\", \r\n    \"contact\": \"1234567\", \r\n    \"location\" : \"VN-HCM\", \r\n    \"profileUrl\": \"test\", \r\n    \"about\": \"test\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8802/api-v1/companies/update-company",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8802",
+					"path": [
+						"api-v1",
+						"companies",
+						"update-company"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "uploadJob",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{companyToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"jobTitle\": \"Test\" ,\r\n    \"jobType\":  \"Full-Time\",\r\n    \"location\": \"New York\",\r\n    \"salary\": \"10\",\r\n    \"vacancies\": \"12\",\r\n    \"experience\": \"2\",\r\n    \"desc\": \"job desc\",\r\n    \"requirements\": \"job requirements\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8801/api-v1/jobs/upload-job",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8801",
+					"path": [
+						"api-v1",
+						"jobs",
+						"upload-job"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getJob",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8801/api-v1/jobs/find-jobs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8801",
+					"path": [
+						"api-v1",
+						"jobs",
+						"find-jobs"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
