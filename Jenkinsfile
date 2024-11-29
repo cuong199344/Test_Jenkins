@@ -223,9 +223,9 @@ pipeline {
                     steps {
                         withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
                             sh '''
-                                sudo npm install -g newman
-                                sudo newman -v
-                                sudo newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                                newman -v
+
+                                newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
                             '''
                         }
                     }
