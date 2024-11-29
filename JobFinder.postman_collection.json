@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "684eacdf-3c27-43e4-ad30-c3cf29f1efba",
 		"name": "JobFinder",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "30978066",
 		"_collection_link": "https://jobfinder-4445.postman.co/workspace/JobFinder-Workspace~b067b4fb-9fdf-48c7-815c-3a11e214916a/collection/30978066-684eacdf-3c27-43e4-ad30-c3cf29f1efba?action=share&source=collection_link&creator=30978066"
 	},
@@ -21,19 +21,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8800/api-v1/users/register",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8800",
-					"path": [
-						"api-v1",
-						"users",
-						"register"
-					]
-				}
+				"url": "http://localhost:8800/api-v1/users/register"
 			},
 			"response": []
 		},
@@ -65,19 +53,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8800/api-v1/users/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8800",
-					"path": [
-						"api-v1",
-						"users",
-						"login"
-					]
-				}
+				"url": "http://localhost:8800/api-v1/users/login"
 			},
 			"response": []
 		},
@@ -92,19 +68,7 @@
 						"type": "text"
 					}
 				],
-				"url": {
-					"raw": "http://localhost:8800/api-v1/users/get-user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8800",
-					"path": [
-						"api-v1",
-						"users",
-						"get-user"
-					]
-				}
+				"url": "http://localhost:8800/api-v1/users/get-user"
 			},
 			"response": []
 		},
@@ -128,19 +92,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8800/api-v1/users/update-user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8800",
-					"path": [
-						"api-v1",
-						"users",
-						"update-user"
-					]
-				}
+				"url": "http://localhost:8800/api-v1/users/update-user"
 			},
 			"response": []
 		},
@@ -158,19 +110,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8802/api-v1/companies/register",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8802",
-					"path": [
-						"api-v1",
-						"companies",
-						"register"
-					]
-				}
+				"url": "http://localhost:8802/api-v1/companies/register"
 			},
 			"response": []
 		},
@@ -214,19 +154,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8802/api-v1/companies/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8802",
-					"path": [
-						"api-v1",
-						"companies",
-						"login"
-					]
-				}
+				"url": "http://localhost:8802/api-v1/companies/login"
 			},
 			"response": []
 		},
@@ -247,13 +175,9 @@
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "",
-							"type": "string"
-						}
-					]
+					"bearer": {
+						"token": ""
+					}
 				},
 				"method": "POST",
 				"header": [
@@ -263,19 +187,7 @@
 						"type": "text"
 					}
 				],
-				"url": {
-					"raw": "http://localhost:8802/api-v1/companies/get-company-profile",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8802",
-					"path": [
-						"api-v1",
-						"companies",
-						"get-company-profile"
-					]
-				}
+				"url": "http://localhost:8802/api-v1/companies/get-company-profile"
 			},
 			"response": []
 		},
@@ -284,19 +196,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": {
-					"raw": "http://localhost:8802/api-v1/companies/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8802",
-					"path": [
-						"api-v1",
-						"companies",
-						""
-					]
-				}
+				"url": "http://localhost:8802/api-v1/companies/"
 			},
 			"response": []
 		},
@@ -320,19 +220,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8802/api-v1/companies/update-company",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8802",
-					"path": [
-						"api-v1",
-						"companies",
-						"update-company"
-					]
-				}
+				"url": "http://localhost:8802/api-v1/companies/update-company"
 			},
 			"response": []
 		},
@@ -356,19 +244,7 @@
 						}
 					}
 				},
-				"url": {
-					"raw": "http://localhost:8801/api-v1/jobs/upload-job",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8801",
-					"path": [
-						"api-v1",
-						"jobs",
-						"upload-job"
-					]
-				}
+				"url": "http://localhost:8801/api-v1/jobs/upload-job"
 			},
 			"response": []
 		},
@@ -377,19 +253,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"url": {
-					"raw": "http://localhost:8801/api-v1/jobs/find-jobs",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8801",
-					"path": [
-						"api-v1",
-						"jobs",
-						"find-jobs"
-					]
-				}
+				"url": "http://localhost:8801/api-v1/jobs/find-jobs"
 			},
 			"response": []
 		}
