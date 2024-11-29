@@ -110,7 +110,7 @@
 						}
 					}
 				},
-				"url": "http://localhost:8800/api-v1/companies/register"
+				"url": "http://localhost:8802/api-v1/companies/register"
 			},
 			"response": []
 		},
