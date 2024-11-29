@@ -218,6 +218,7 @@ pipeline {
                     }
                 }
 
+
                 stage('Postman CLI Login') {
                     steps {
                         withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
