@@ -201,14 +201,6 @@ pipeline {
 
                                 docker ps
                             '''
-                            // def response = sh(
-                            //     script: '''
-                            //         curl -I http://localhost:8802/company/api-v1/companies/register
-                            //     ''',
-                            //     returnStdout: true // Lấy kết quả trả về từ lệnh curl và hiển thị lên
-                            // ).trim()
-                    
-                            // echo "Response: ${response}"
                         }
                     }
                 }
