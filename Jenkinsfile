@@ -223,7 +223,8 @@ pipeline {
                     steps {
                         withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
                             sh '''
-                                npm install newman
+                                npm install -g newman
+                                newman -v
                                 newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
                             '''
                         }
