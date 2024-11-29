@@ -213,16 +213,19 @@ pipeline {
                 //     }
                 // }
 
-                stage('Install newman'){
-                    steps{
-                        sh 'npm install newman'
-                    }
-                }
+                // stage('Install newman'){
+                //     steps{
+                //         sh 'npm install newman'
+                //     }
+                // }
 
                 stage('Running collection') {
                     steps {
                         withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
-                            sh 'newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS'
+                            sh '''
+                                npm install newman
+                                newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                            '''
                         }
                     }
                 }
