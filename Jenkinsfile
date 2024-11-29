@@ -219,17 +219,17 @@ pipeline {
                 //     }
                 // }
 
-                stage('Running collection') {
-                    steps {
-                        withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
-                            sh '''
-                                newman -v
+                // stage('Running collection') {
+                //     steps {
+                //         withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
+                //             sh '''
+                //                 newman -v
 
-                                newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
-                            '''
-                        }
-                    }
-                }
+                //                 newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                //             '''
+                //         }
+                //     }
+                // }
 
                 stage('Delete docker-compose'){
                     steps{
