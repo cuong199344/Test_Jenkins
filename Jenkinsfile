@@ -212,7 +212,27 @@ pipeline {
                         }
                     }
                 }
+                stage('Install Postman CLI') {
+                    steps {
+                        sh 'curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh'
+                    }
+                }
 
+                stage('Postman CLI Login') {
+                    steps {
+                        withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
+                            sh 'postman login --with-api-key $POSTMAN_API_KEY'
+                        } 
+                    }
+                }
+
+                stage('Running collection') {
+                    steps {
+                        withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
+                            sh 'postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS'
+                        }
+                    }
+                }
                 stage('Delete docker-compose'){
                     steps{
                         script{
