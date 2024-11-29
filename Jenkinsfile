@@ -224,6 +224,7 @@ pipeline {
                 stage('Running collection') {
                     steps {
                         withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
+                            sh 'ls'
                             sh 'postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS'
                         }
                     }
