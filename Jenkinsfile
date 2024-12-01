@@ -258,9 +258,9 @@ pipeline {
                             sh '''
                                 docker-compose down
                                 docker system prune -f
-                                docker rmi dangxuancuong/${JOB}
-                                docker rmi dangxuancuong/${COMPANY}
-                                docker rmi dangxuancuong/${USER}
+                                docker rmi dangxuancuong/${env.JOB}
+                                docker rmi dangxuancuong/${env.COMPANY}
+                                docker rmi dangxuancuong/${env.USER}
                                 docker rm -f mongo1 mongo2 mongo3
 
                                 docker ps
