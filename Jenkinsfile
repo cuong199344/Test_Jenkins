@@ -146,6 +146,7 @@ pipeline {
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 docker push dangxuancuong/job_jenkins_test:${DOCKER_TAG}
                             '''
+                            env.BUILD_TEST_SERVICE_1 = "true"
                         }
                     }
                 }
@@ -165,6 +166,7 @@ pipeline {
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 docker push dangxuancuong/company_jenkins_test:${DOCKER_TAG}
                             '''
+                            env.BUILD_TEST_SERVICE_2 = "true"
                         }
                     }
                 }
@@ -185,47 +187,69 @@ pipeline {
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 docker push dangxuancuong/user_jenkins_test:${DOCKER_TAG}
                             '''
+                            env.BUILD_TEST_SERVICE_3 = "true"
                         }
                     }
                 }
-                stage('Test run docker-compose'){
+                stage('Test using Postman'){
+                    when{
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_1 == "true" };
+                            expression { env.BUILD_TEST_SERVICE_2 == "true" }
+                            expression { env.BUILD_TEST_SERVICE_3 == "true" };
+                        }
+                    }
                     steps{
                         script{
 
+                            if (env.BUILD_TEST_SERVICE_1 == "true"){
+                                env.JOB = "job_jenkins_test:${DOCKER_TAG}"
+                            }
+                            else{
+                                env.JOB = "job_jenkins"
+                            }
+
+                            if (env.BUILD_TEST_SERVICE_2 == "true"){
+                                env.COMPANY = "company_jenkins_test:${DOCKER_TAG}"
+                            }
+                            else{
+                                env.COMPANY = "company_jenkins"
+                            }
+
+                            if (env.BUILD_TEST_SERVICE_3 == "true"){
+                                env.USER = "user_jenkins_test:${DOCKER_TAG}"
+                            }
+                            else{
+                                env.USER = "user_jenkins"
+                            }
+
                             sh '''
-                                docker pull dangxuancuong/job_jenkins
-                                docker pull dangxuancuong/company_jenkins
-                                docker pull dangxuancuong/user_jenkins
+                                docker pull dangxuancuong/${env.JOB}
+                                docker pull dangxuancuong/${env.COMPANY}
+                                docker pull dangxuancuong/${env.USER}
 
                                 docker-compose up -d
 
                                 docker ps
                             '''
+                             withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
+                                sh 'postman login --with-api-key $POSTMAN_API_KEY'
+                            } 
+                            withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
+                                sh '''
+                                    postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                                '''
+                            }
+                            env.FINISH_TEST = "true"
                         }
                     }
                 }
 
-                stage('Postman CLI Login') {
-                    steps {
-                        withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
-                            sh 'postman login --with-api-key $POSTMAN_API_KEY'
-                        } 
-                    }
-                }
-
-                stage('Running collection') {
-                    steps {
-                        withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
-                            sh '''
-                                postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
-                            '''
-                        }
-                    }
-                }
-
-                // stage('Install newman'){
-                //     steps{
-                //         sh 'npm install newman'
+                // stage('Postman CLI Login') {
+                //     steps {
+                //         withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
+                //             sh 'postman login --with-api-key $POSTMAN_API_KEY'
+                //         } 
                 //     }
                 // }
 
@@ -233,15 +257,16 @@ pipeline {
                 //     steps {
                 //         withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
                 //             sh '''
-                //                 newman -v
-
-                //                 newman run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                //                 postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
                 //             '''
                 //         }
                 //     }
                 // }
 
                 stage('Delete docker-compose'){
+                    when{
+                        expression { env.FINISH_TEST == "true" };
+                    }
                     steps{
                         script{
                             sh '''
