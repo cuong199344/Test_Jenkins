@@ -202,22 +202,9 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB = "job_jenkins"
-                            env.COMPANY = "company_jenkins"
-                            env.USER = "user_jenkins"
-
-
-                            if (env.BUILD_TEST_SERVICE_1 == "true"){
-                                env.JOB = "job_jenkins_test:${DOCKER_TAG}"
-                            }
-
-                            if (env.BUILD_TEST_SERVICE_2 == "true"){
-                                env.COMPANY = "company_jenkins_test:${DOCKER_TAG}"
-                            }
-
-                            if (env.BUILD_TEST_SERVICE_3 == "true"){
-                                env.USER = "user_jenkins_test:${DOCKER_TAG}"
-                            }
+                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_jenkins"
+                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_jenkins"
+                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_jenkins"
 
                             sh '''
                                 docker pull dangxuancuong/${env.JOB}
@@ -276,7 +263,7 @@ pipeline {
                         script{
                             sh '''
                                 docker-compose down
-
+                                docker system prune -f
                                 docker rmi dangxuancuong/${JOB}
                                 docker rmi dangxuancuong/${COMPANY}
                                 docker rmi dangxuancuong/${USER}
