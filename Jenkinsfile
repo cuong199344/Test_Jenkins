@@ -191,7 +191,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Test using Postman'){
+                stage('Docker-compose'){
                     when{
                         anyOf{
                             expression { env.BUILD_TEST_SERVICE_1 == "true" };
@@ -201,7 +201,6 @@ pipeline {
                     }
                     steps{
                         script{
-
                             if (env.BUILD_TEST_SERVICE_1 == "true"){
                                 env.JOB = "job_jenkins_test:${DOCKER_TAG}"
                             }
@@ -232,27 +231,47 @@ pipeline {
 
                                 docker ps
                             '''
-                             withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
-                                sh 'postman login --with-api-key $POSTMAN_API_KEY'
-                            } 
-                            withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
-                                sh '''
-                                    postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
-                                '''
-                            }
-                            env.FINISH_TEST = "true"
+                            //  withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
+                            //     sh 'postman login --with-api-key $POSTMAN_API_KEY'
+                            // } 
+                            // withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
+                            //     sh '''
+                            //         postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                            //     '''
+                            // }
+                            // env.FINISH_TEST = "true"
                         }
+                    }
+                }
+                post {
+                    always {
+                        sh '''
+                                docker-compose down
+
+                                docker rmi dangxuancuong/${JOB}
+                                docker rmi dangxuancuong/${COMPANY}
+                                docker rmi dangxuancuong/${USER}
+                                docker rm -f mongo1 mongo2 mongo3
+
+                                docker system prune -f
+                        '''
                     }
                 }
 
 
-                // stage('Postman CLI Login') {
-                //     steps {
-                //         withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
-                //             sh 'postman login --with-api-key $POSTMAN_API_KEY'
-                //         } 
-                //     }
-                // }
+                stage('Run test with Postman') {
+                    steps {
+                        withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
+                            sh 'postman login --with-api-key $POSTMAN_API_KEY'
+                        }
+                        withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
+                            sh '''
+                                postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                            '''
+                        }
+                        env.FINISH_TEST == "true"
+                    }
+                }
 
                 // stage('Running collection') {
                 //     steps {
@@ -281,6 +300,21 @@ pipeline {
                                 docker ps
                             '''
                         }
+                    }
+                }
+
+                post {
+                    always {
+                        sh '''
+                                docker-compose down
+
+                                docker rmi dangxuancuong/${JOB}
+                                docker rmi dangxuancuong/${COMPANY}
+                                docker rmi dangxuancuong/${USER}
+                                docker rm -f mongo1 mongo2 mongo3
+
+                                docker system prune -f
+                        '''
                     }
                 }
                 
