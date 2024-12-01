@@ -120,10 +120,9 @@ pipeline {
                                     npm install
                                     npm run test
                                 ''', 
-                                returnStatus: true // Trả về mã thoát của lệnh
+                                returnStatus: true 
                             )
 
-                            // Kiểm tra kết quả và thiết lập biến môi trường
                             if (testResult == 0) {
                                 echo "Tests passed!"
                                 env.TEST_USER_RESULT = "PASSED"
@@ -135,13 +134,13 @@ pipeline {
                     }
                 }
 
-                stage('Build Docker Image for job') {
+                stage('Build test Docker Image for job') {
                     when {
                         expression { env.BUILD_SERVICE1 == "true" }
                     }
                     steps {
                         script {
-                            echo 'Building Docker Image for job...'
+                            echo 'Building test Docker Image for job...'
                             sh '''
                                 docker build -t dangxuancuong/job_jenkins_test:${DOCKER_TAG} ./job
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
@@ -152,7 +151,7 @@ pipeline {
                     }
                 }
         
-                stage('Build Docker Image for company') {
+                stage('Build test Docker Image for company') {
                     when {
                         allOf {
                             expression { env.BUILD_SERVICE2 == "true" };
@@ -161,7 +160,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            echo 'Building Docker Image for company...'
+                            echo 'Building test Docker Image for company...'
                             sh '''
                                 docker build -t dangxuancuong/company_jenkins_test:${DOCKER_TAG} ./company
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
@@ -172,7 +171,7 @@ pipeline {
                     }
                 }
                 
-                stage('Build Docker Image for user') {
+                stage('Build test Docker Image for user') {
                     when {
                         allOf {
                             expression { env.BUILD_SERVICE3 == "true" };
@@ -182,7 +181,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            echo 'Building Docker Image for user...'
+                            echo 'Building test Docker Image for user...'
                             sh '''
                                 docker build -t dangxuancuong/user_jenkins_test:${DOCKER_TAG} ./user
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
@@ -196,7 +195,7 @@ pipeline {
                     when{
                         anyOf{
                             expression { env.BUILD_TEST_SERVICE_1 == "true" };
-                            expression { env.BUILD_TEST_SERVICE_2 == "true" }
+                            expression { env.BUILD_TEST_SERVICE_2 == "true" };
                             expression { env.BUILD_TEST_SERVICE_3 == "true" };
                         }
                     }
@@ -215,10 +214,6 @@ pipeline {
 
                                 docker ps
                             '''
-                            echo "Job : ${env.JOB}"
-                            echo "Company: ${env.COMPANY}"
-                            echo "User: ${env.USER}"
-
                             env.READY_FOR_TEST = "true"
                         }
                     }
@@ -251,19 +246,68 @@ pipeline {
                     }
                     steps{
                         script{
-                            echo "Job : ${JOB}"
-                            echo "Company: ${COMPANY}"
-                            echo "User: ${USER}"
-
                             sh '''
                                 docker-compose down
                                 docker system prune -f
-                                docker rmi dangxuancuong/$JOB
-                                docker rmi dangxuancuong/$COMPANY
-                                docker rmi dangxuancuong/$USER
-                                docker rm -f mongo1 mongo2 mongo3
 
                                 docker ps
+                            '''
+                        }
+                    }
+                }
+
+                stage('Build Docker Image for job') {
+                    when {
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_1 == "true" };
+                            expression { env.FINISH_TEST == "true"};
+                        }
+                    }
+                    steps {
+                        script {
+                            echo 'Building Docker Image for job...'
+                            sh '''
+                                docker build -t dangxuancuong/job_jenkins ./job
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/job_jenkins
+                            '''
+                        }
+                    }
+                }
+        
+                stage('Build Docker Image for company') {
+                    when {
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_2 == "true" };
+                            expression { env.FINISH_TEST == "true"};
+                        }
+                    }
+                    steps {
+                        script {
+                            echo 'Building Docker Image for company...'
+                            sh '''
+                                docker build -t dangxuancuong/company_jenkins ./company
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/company_jenkins
+                            '''
+                        }
+                    }
+                }
+                
+                stage('Build Docker Image for user') {
+                    when {
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_3 == "true" };
+                            expression { env.FINISH_TEST == "true"};
+                        }
+                    }
+                    steps {
+                        script {
+                            echo 'Building Docker Image for user...'
+                            sh '''
+                                docker build -t dangxuancuong/user_jenkins ./user
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/user_jenkins
                             '''
                         }
                     }
@@ -284,6 +328,14 @@ pipeline {
                 //     }
                 // }
                 
+            }
+        }
+        post {
+            always {
+                sh '''
+                        docker-compose down
+                        docker system prune -f
+                '''
             }
         }
 
