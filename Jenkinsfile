@@ -283,20 +283,20 @@ pipeline {
                     }
                 }
 
-                post {
-                    always {
-                        sh '''
-                                docker-compose down
+                // post {
+                //     always {
+                //         sh '''
+                //                 docker-compose down
 
-                                docker rmi dangxuancuong/${JOB}
-                                docker rmi dangxuancuong/${COMPANY}
-                                docker rmi dangxuancuong/${USER}
-                                docker rm -f mongo1 mongo2 mongo3
+                //                 docker rmi dangxuancuong/${JOB}
+                //                 docker rmi dangxuancuong/${COMPANY}
+                //                 docker rmi dangxuancuong/${USER}
+                //                 docker rm -f mongo1 mongo2 mongo3
 
-                                docker system prune -f
-                        '''
-                    }
-                }
+                //                 docker system prune -f
+                //         '''
+                //     }
+                // }
                 
             }
         }
