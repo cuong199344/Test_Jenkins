@@ -8,6 +8,7 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
+
     }
 
     stages {
@@ -17,7 +18,7 @@ pipeline {
                     // Checkout code từ GitHub repository sử dụng Jenkins GitSCM
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: '*/master']],
+                        branches: [[name: '*/deb']],
                         userRemoteConfigs: [[
                             url: 'https://github.com/cuong199344/Test_Jenkins.git',
                             credentialsId: GIT_CREDENTIALS_ID
@@ -76,9 +77,9 @@ pipeline {
         }
         
         stage('Deb change'){
-            // when{
-            //     branch 'deb'
-            // }
+            when{
+                branch 'deb'
+            }
             stages{
                 stage('Test company') {
                     when {
@@ -89,7 +90,7 @@ pipeline {
                             def testResult = sh(
                                 script: '''
                                     cd company
-                                    npm ci
+                                    npm install
                                     npm run test
                                 ''', 
                                 returnStatus: true // Trả về mã thoát của lệnh
@@ -116,13 +117,12 @@ pipeline {
                             def testResult = sh(
                                 script: '''
                                     cd user
-                                    npm ci
+                                    npm install
                                     npm run test
                                 ''', 
-                                returnStatus: true // Trả về mã thoát của lệnh
+                                returnStatus: true 
                             )
 
-                            // Kiểm tra kết quả và thiết lập biến môi trường
                             if (testResult == 0) {
                                 echo "Tests passed!"
                                 env.TEST_USER_RESULT = "PASSED"
@@ -134,9 +134,134 @@ pipeline {
                     }
                 }
 
-                stage('Build Docker Image for job') {
+                stage('Build test Docker Image for job') {
                     when {
                         expression { env.BUILD_SERVICE1 == "true" }
+                    }
+                    steps {
+                        script {
+                            echo 'Building test Docker Image for job...'
+                            sh '''
+                                docker build -t dangxuancuong/job_jenkins_test:${DOCKER_TAG} ./job
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/job_jenkins_test:${DOCKER_TAG}
+                            '''
+                            env.BUILD_TEST_SERVICE_1 = "true"
+                        }
+                    }
+                }
+        
+                stage('Build test Docker Image for company') {
+                    when {
+                        allOf {
+                            expression { env.BUILD_SERVICE2 == "true" };
+                            expression { env.TEST_COMPANY_RESULT == "PASSED" }
+                        }
+                    }
+                    steps {
+                        script {
+                            echo 'Building test Docker Image for company...'
+                            sh '''
+                                docker build -t dangxuancuong/company_jenkins_test:${DOCKER_TAG} ./company
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/company_jenkins_test:${DOCKER_TAG}
+                            '''
+                            env.BUILD_TEST_SERVICE_2 = "true"
+                        }
+                    }
+                }
+                
+                stage('Build test Docker Image for user') {
+                    when {
+                        allOf {
+                            expression { env.BUILD_SERVICE3 == "true" };
+                            expression { env.TEST_USER_RESULT == "PASSED" }
+                        }
+                
+                    }
+                    steps {
+                        script {
+                            echo 'Building test Docker Image for user...'
+                            sh '''
+                                docker build -t dangxuancuong/user_jenkins_test:${DOCKER_TAG} ./user
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                docker push dangxuancuong/user_jenkins_test:${DOCKER_TAG}
+                            '''
+                            env.BUILD_TEST_SERVICE_3 = "true"
+                        }
+                    }
+                }
+                stage('Docker-compose'){
+                    when{
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_1 == "true" };
+                            expression { env.BUILD_TEST_SERVICE_2 == "true" };
+                            expression { env.BUILD_TEST_SERVICE_3 == "true" };
+                        }
+                    }
+                    steps{
+                        script{
+                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_jenkins"
+                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_jenkins"
+                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_jenkins"
+
+                            sh '''
+                                docker pull dangxuancuong/$JOB
+                                docker pull dangxuancuong/$COMPANY
+                                docker pull dangxuancuong/$USER
+
+                                docker-compose up -d
+
+                                docker ps
+                            '''
+                            env.READY_FOR_TEST = "true"
+                        }
+                    }
+                }
+
+
+                stage('Run test with Postman') {
+                    when{
+                        expression { env.READY_FOR_TEST == "true" }
+                    }
+                    steps {
+                        withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
+                            sh 'postman login --with-api-key $POSTMAN_API_KEY'
+                        }
+                        withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
+                            sh '''
+                                postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
+                            '''
+                        }
+                        script {
+                            env.FINISH_TEST = "true" 
+                        }
+                    }
+                }
+
+
+                stage('Delete docker-compose'){
+                    when{
+                        expression { env.FINISH_TEST == "true" };
+                    }
+                    steps{
+                        script{
+                            sh '''
+                                docker-compose down
+                                docker system prune -f
+
+                                docker ps
+                            '''
+                        }
+                    }
+                }
+
+                stage('Build Docker Image for job') {
+                    when {
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_1 == "true" };
+                            expression { env.FINISH_TEST == "true"};
+                        }
                     }
                     steps {
                         script {
@@ -152,9 +277,9 @@ pipeline {
         
                 stage('Build Docker Image for company') {
                     when {
-                        allOf {
-                            expression { env.BUILD_SERVICE2 == "true" };
-                            expression { env.TEST_COMPANY_RESULT == "PASSED" }
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_2 == "true" };
+                            expression { env.FINISH_TEST == "true"};
                         }
                     }
                     steps {
@@ -171,11 +296,10 @@ pipeline {
                 
                 stage('Build Docker Image for user') {
                     when {
-                        allOf {
-                            expression { env.BUILD_SERVICE3 == "true" };
-                            expression { env.TEST_USER_RESULT == "PASSED" }
+                        anyOf{
+                            expression { env.BUILD_TEST_SERVICE_3 == "true" };
+                            expression { env.FINISH_TEST == "true"};
                         }
-                
                     }
                     steps {
                         script {
@@ -185,30 +309,6 @@ pipeline {
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 docker push dangxuancuong/user_jenkins
                             '''
-                        }
-                    }
-                }
-                stage('Test run docker-compose'){
-                    steps{
-                        script{
-
-                            sh '''
-                                docker pull dangxuancuong/job_jenkins
-                                docker pull dangxuancuong/company_jenkins
-                                docker pull dangxuancuong/user_jenkins
-
-                                docker-compose up -d
-
-                                docker ps
-
-                                docker-compose down
-
-                                docker rmi dangxuancuong/job_jenkins
-                                docker rmi dangxuancuong/company_jenkins
-                                docker rmi dangxuancuong/user_jenkins
-                            '''
-
-
                         }
                     }
                 }
@@ -291,5 +391,13 @@ pipeline {
         //         }   
         //     }
         // }
+    }
+    post {
+        always {
+            sh '''
+                docker-compose down
+                docker system prune -f
+            '''
+        }
     }
 }
