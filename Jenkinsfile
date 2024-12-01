@@ -249,7 +249,9 @@ pipeline {
                                 postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
                             '''
                         }
-                        env.FINISH_TEST == "true"
+                        script {
+                            env.FINISH_TEST = "true" // Proper assignment
+                        }
                     }
                 }
 
