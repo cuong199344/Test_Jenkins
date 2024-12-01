@@ -315,14 +315,14 @@ pipeline {
                 
             }
         }
-        // post {
-        //     always {
-        //         sh '''
-        //                 docker-compose down
-        //                 docker system prune -f
-        //         '''
-        //     }
-        // }
+        post {
+            always {
+                sh '''
+                        docker-compose down
+                        docker system prune -f
+                '''
+            }
+        }
 
         // stage('test k8s') {
         //     when{
