@@ -318,7 +318,7 @@ pipeline {
 
         stage('For the PR'){
             when{
-                brand 'PR-*'
+                branch 'PR-*'
             }
             steps{
                 echo 'This is only for PR 123'
