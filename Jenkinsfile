@@ -316,6 +316,15 @@ pipeline {
             }
         }
 
+        stage('For the PR'){
+            when{
+                brand 'PR-*'
+            }
+            steps{
+                echo 'This is only for PR'
+            }
+        }
+
         // stage('test k8s') {
         //     when{
         //         branch 'master'
