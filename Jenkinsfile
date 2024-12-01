@@ -8,9 +8,7 @@ pipeline {
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
-        JOB = "job_jenkins"
-        COMPANY = "company_jenkins"
-        USER = "user_jenkins"
+
     }
 
     stages {
@@ -204,6 +202,11 @@ pipeline {
                     }
                     steps{
                         script{
+                            env.JOB = "job_jenkins"
+                            env.COMPANY = "company_jenkins"
+                            env.USER = "user_jenkins"
+
+
                             if (env.BUILD_TEST_SERVICE_1 == "true"){
                                 env.JOB = "job_jenkins_test:${DOCKER_TAG}"
                             }
