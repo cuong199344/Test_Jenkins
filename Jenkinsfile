@@ -316,14 +316,14 @@ pipeline {
             }
         }
 
-        stage('For the PR'){
-            when{
-                branch 'PR-*'
-            }
-            steps{
-                echo 'This is only for PR 123'
-            }
-        }
+        // stage('For the PR'){
+        //     when{
+        //         branch 'PR-*'
+        //     }
+        //     steps{
+        //         echo 'This is only for PR 123'
+        //     }
+        // }
 
         // stage('test k8s') {
         //     when{
