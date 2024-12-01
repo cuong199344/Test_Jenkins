@@ -219,7 +219,6 @@ pipeline {
                     }
                 }
 
-
                 stage('Run test with Postman') {
                     when{
                         expression { env.READY_FOR_TEST == "true" }
