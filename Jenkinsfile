@@ -321,7 +321,7 @@ pipeline {
                 brand 'PR-*'
             }
             steps{
-                echo 'This is only for PR'
+                echo 'This is only for PR 123'
             }
         }
 
