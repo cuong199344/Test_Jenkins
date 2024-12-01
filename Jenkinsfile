@@ -314,14 +314,6 @@ pipeline {
                 }
                 
             }
-            post {
-                always {
-                    sh '''
-                        docker-compose down
-                        docker system prune -f
-                    '''
-                }
-            }
         }
 
 
@@ -400,5 +392,13 @@ pipeline {
         //         }   
         //     }
         // }
+    }
+    post {
+        always {
+            sh '''
+                docker-compose down
+                docker system prune -f
+            '''
+        }
     }
 }
