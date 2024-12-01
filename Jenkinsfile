@@ -316,7 +316,6 @@ pipeline {
             }
         }
 
-
         // stage('test k8s') {
         //     when{
         //         branch 'master'
