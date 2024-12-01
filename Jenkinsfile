@@ -207,9 +207,9 @@ pipeline {
                             env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_jenkins"
 
                             sh '''
-                                docker pull dangxuancuong/${env.JOB}
-                                docker pull dangxuancuong/${env.COMPANY}
-                                docker pull dangxuancuong/${env.USER}
+                                docker pull dangxuancuong/$JOB
+                                docker pull dangxuancuong/$COMPANY
+                                docker pull dangxuancuong/$USER
 
                                 docker-compose up -d
 
@@ -258,9 +258,9 @@ pipeline {
                             sh '''
                                 docker-compose down
                                 docker system prune -f
-                                docker rmi dangxuancuong/${env.JOB}
-                                docker rmi dangxuancuong/${env.COMPANY}
-                                docker rmi dangxuancuong/${env.USER}
+                                docker rmi dangxuancuong/$JOB
+                                docker rmi dangxuancuong/$COMPANY
+                                docker rmi dangxuancuong/$USER
                                 docker rm -f mongo1 mongo2 mongo3
 
                                 docker ps
