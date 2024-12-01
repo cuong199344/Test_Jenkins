@@ -77,9 +77,9 @@ pipeline {
         }
         
         stage('Deb change'){
-            // when{
-            //     branch 'deb'
-            // }
+            when{
+                branch 'deb'
+            }
             stages{
                 stage('Test company') {
                     when {
@@ -234,7 +234,7 @@ pipeline {
                             '''
                         }
                         script {
-                            env.FINISH_TEST = "true" // Proper assignment
+                            env.FINISH_TEST = "true" 
                         }
                     }
                 }
@@ -312,32 +312,17 @@ pipeline {
                         }
                     }
                 }
-
-                // post {
-                //     always {
-                //         sh '''
-                //                 docker-compose down
-
-                //                 docker rmi dangxuancuong/${JOB}
-                //                 docker rmi dangxuancuong/${COMPANY}
-                //                 docker rmi dangxuancuong/${USER}
-                //                 docker rm -f mongo1 mongo2 mongo3
-
-                //                 docker system prune -f
-                //         '''
-                //     }
-                // }
                 
             }
         }
-        post {
-            always {
-                sh '''
-                        docker-compose down
-                        docker system prune -f
-                '''
-            }
-        }
+        // post {
+        //     always {
+        //         sh '''
+        //                 docker-compose down
+        //                 docker system prune -f
+        //         '''
+        //     }
+        // }
 
         // stage('test k8s') {
         //     when{
