@@ -215,15 +215,6 @@ pipeline {
 
                                 docker ps
                             '''
-                            //  withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
-                            //     sh 'postman login --with-api-key $POSTMAN_API_KEY'
-                            // } 
-                            // withCredentials([string(credentialsId: 'Postman_collection_and_environments', variable: 'POSTMAN_COLLECTION_AND_ENVIRONMENTS')]) {
-                            //     sh '''
-                            //         postman collection run $POSTMAN_COLLECTION_AND_ENVIRONMENTS
-                            //     '''
-                            // }
-                            // env.FINISH_TEST = "true"
                         }
                     }
                 }
@@ -255,25 +246,25 @@ pipeline {
                 //     }
                 // }
 
-                stage('Delete docker-compose'){
-                    when{
-                        expression { env.FINISH_TEST == "true" };
-                    }
-                    steps{
-                        script{
-                            sh '''
-                                docker-compose down
-                                docker system prune -f
-                                docker rmi dangxuancuong/${JOB}
-                                docker rmi dangxuancuong/${COMPANY}
-                                docker rmi dangxuancuong/${USER}
-                                docker rm -f mongo1 mongo2 mongo3
+                // stage('Delete docker-compose'){
+                //     when{
+                //         expression { env.FINISH_TEST == "true" };
+                //     }
+                //     steps{
+                //         script{
+                //             sh '''
+                //                 docker-compose down
+                //                 docker system prune -f
+                //                 docker rmi dangxuancuong/${JOB}
+                //                 docker rmi dangxuancuong/${COMPANY}
+                //                 docker rmi dangxuancuong/${USER}
+                //                 docker rm -f mongo1 mongo2 mongo3
 
-                                docker ps
-                            '''
-                        }
-                    }
-                }
+                //                 docker ps
+                //             '''
+                //         }
+                //     }
+                // }
 
                 // post {
                 //     always {
