@@ -222,7 +222,7 @@ pipeline {
 
                 stage('Run test with Postman') {
                     when{
-                        expression { env.READY_FOR_TEST = "true" }
+                        expression { env.READY_FOR_TEST == "true" }
                     }
                     steps {
                         withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
@@ -392,5 +392,13 @@ pipeline {
         //         }   
         //     }
         // }
+    }
+    post {
+        always {
+            sh '''
+                docker-compose down
+                docker system prune -f
+            '''
+        }
     }
 }
