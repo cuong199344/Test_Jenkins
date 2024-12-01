@@ -207,9 +207,9 @@ pipeline {
                             env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_jenkins"
 
                             sh '''
-                                docker pull dangxuancuong/job_jenkins
-                                docker pull dangxuancuong/company_jenkins
-                                docker pull dangxuancuong/user_jenkins
+                                docker pull dangxuancuong/${env.JOB}
+                                docker pull dangxuancuong/${env.COMPANY}
+                                docker pull dangxuancuong/${env.USER}
 
                                 docker-compose up -d
 
@@ -218,12 +218,17 @@ pipeline {
                             echo "Job : ${env.JOB}"
                             echo "Company: ${env.COMPANY}"
                             echo "User: ${env.USER}"
+
+                            env.READY_FOR_TEST = "true"
                         }
                     }
                 }
 
 
                 stage('Run test with Postman') {
+                    when{
+                        expression { env.READY_FOR_TEST = "true" }
+                    }
                     steps {
                         withCredentials([string(credentialsId: 'POSTMAN_API_KEY', variable: 'POSTMAN_API_KEY')]) {
                             sh 'postman login --with-api-key $POSTMAN_API_KEY'
@@ -253,9 +258,9 @@ pipeline {
                             sh '''
                                 docker-compose down
                                 docker system prune -f
-                                docker rmi dangxuancuong/job_jenkins
-                                docker rmi dangxuancuong/company_jenkins
-                                docker rmi dangxuancuong/user_jenkins
+                                docker rmi dangxuancuong/${JOB}
+                                docker rmi dangxuancuong/${COMPANY}
+                                docker rmi dangxuancuong/${USER}
                                 docker rm -f mongo1 mongo2 mongo3
 
                                 docker ps
