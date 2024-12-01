@@ -272,9 +272,9 @@ pipeline {
                             sh '''
                                 docker-compose down
 
-                                docker rmi dangxuancuong/job_jenkins
-                                docker rmi dangxuancuong/company_jenkins
-                                docker rmi dangxuancuong/user_jenkins
+                                docker rmi dangxuancuong/${JOB}
+                                docker rmi dangxuancuong/${COMPANY}
+                                docker rmi dangxuancuong/${USER}
                                 docker rm -f mongo1 mongo2 mongo3
 
                                 docker ps
