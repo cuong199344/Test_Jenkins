@@ -202,9 +202,9 @@ pipeline {
                     }
                     steps{
                         script{
-                            // env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_jenkins"
-                            // env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_jenkins"
-                            // env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_jenkins"
+                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_jenkins"
+                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_jenkins"
+                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_jenkins"
 
                             sh '''
                                 docker pull dangxuancuong/job_jenkins
@@ -215,6 +215,9 @@ pipeline {
 
                                 docker ps
                             '''
+                            echo "Job : ${env.JOB}"
+                            echo "Company: ${env.COMPANY}"
+                            echo "User: ${env.USER}"
                         }
                     }
                 }
@@ -243,6 +246,10 @@ pipeline {
                     }
                     steps{
                         script{
+                            echo "Job : ${JOB}"
+                            echo "Company: ${COMPANY}"
+                            echo "User: ${USER}"
+
                             sh '''
                                 docker-compose down
                                 docker system prune -f
