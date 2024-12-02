@@ -319,7 +319,7 @@ pipeline {
             }
         }
 
-        stage('For the PR'){
+        stage('For the master'){
             when{
                 branch 'master'
             }
