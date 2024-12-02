@@ -319,14 +319,14 @@ pipeline {
             }
         }
 
-        // stage('For the PR'){
-        //     when{
-        //         branch 'PR-*'
-        //     }
-        //     steps{
-        //         echo 'This is only for PR 123'
-        //     }
-        // }
+        stage('For the PR'){
+            when{
+                branch 'master'
+            }
+            steps{
+                echo 'Test merge for master'
+            }
+        }
 
         // stage('test k8s') {
         //     when{
