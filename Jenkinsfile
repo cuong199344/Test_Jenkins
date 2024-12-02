@@ -318,14 +318,6 @@ pipeline {
                 
             }
         }
-        post {
-            always {
-                sh '''
-                    docker-compose down
-                    docker system prune -f
-                '''
-            }
-        }
 
         stage('For the master'){
             when{
@@ -412,12 +404,12 @@ pipeline {
         //     }
         // }
     }
-    // post {
-    //     always {
-    //         sh '''
-    //             docker-compose down
-    //             docker system prune -f
-    //         '''
-    //     }
-    // }
+    post {
+        always {
+            sh '''
+                docker-compose down
+                docker system prune -f
+            '''
+        }
+    }
 }
