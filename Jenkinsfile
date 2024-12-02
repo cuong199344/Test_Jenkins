@@ -318,8 +318,16 @@ pipeline {
                 
             }
         }
+        post {
+            always {
+                sh '''
+                    docker-compose down
+                    docker system prune -f
+                '''
+            }
+        }
 
-        stage('For the PR'){
+        stage('For the master'){
             when{
                 branch 'master'
             }
@@ -404,16 +412,12 @@ pipeline {
         //     }
         // }
     }
-    post {
-        when{
-            branch 'deb';
-            branch 'PR-*';
-        }
-        always {
-            sh '''
-                docker-compose down
-                docker system prune -f
-            '''
-        }
-    }
+    // post {
+    //     always {
+    //         sh '''
+    //             docker-compose down
+    //             docker system prune -f
+    //         '''
+    //     }
+    // }
 }
