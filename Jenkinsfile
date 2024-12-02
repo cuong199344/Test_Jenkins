@@ -319,15 +319,6 @@ pipeline {
             }
         }
 
-        stage('For the master'){
-            when{
-                branch 'master'
-            }
-            steps{
-                echo 'Test merge for master'
-            }
-        }
-
         // stage('test k8s') {
         //     when{
         //         branch 'master'
