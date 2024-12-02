@@ -78,7 +78,8 @@ pipeline {
         
         stage('Deb change'){
             when{
-                branch 'deb'
+                // branch 'deb';
+                branch 'PR-*';
             }
             stages{
                 stage('Test company') {
@@ -103,7 +104,9 @@ pipeline {
                             } else {
                                 echo "Tests failed!"
                                 env.TEST_COMPANY_RESULT = "FAILED"
+                                error("Tests failed, marking build as FAILED.")
                             }
+                            
                         }
                     }
                 }
@@ -129,6 +132,7 @@ pipeline {
                             } else {
                                 echo "Tests failed!"
                                 env.TEST_USER_RESULT = "FAILED"
+                                error("Tests failed, marking build as FAILED.")
                             }
                         }
                     }
