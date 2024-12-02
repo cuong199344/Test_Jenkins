@@ -405,6 +405,10 @@ pipeline {
         // }
     }
     post {
+        when{
+            branch 'deb';
+            branch 'PR-*';
+        }
         always {
             sh '''
                 docker-compose down
