@@ -2,9 +2,6 @@ pipeline {
     agent any
     
     environment {
-        JOB_IMAGE = 'dangxuancuong/job_jenkins'
-        USER_IMAGE = 'dangxuancuong/user_jenkins'
-        COMPANY_IMAGE = 'dangxuancuong/company_jenkins'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -146,9 +143,9 @@ pipeline {
                         script {
                             echo 'Building test Docker Image for job...'
                             sh '''
-                                docker build -t dangxuancuong/job_jenkins_test:${DOCKER_TAG} ./job
+                                docker build -t nguyenhung1402/job_jenkins_test:${DOCKER_TAG} ./job
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/job_jenkins_test:${DOCKER_TAG}
+                                docker push nguyenhung1402/job_jenkins_test:${DOCKER_TAG}
                             '''
                             env.BUILD_TEST_SERVICE_1 = "true"
                         }
@@ -166,9 +163,9 @@ pipeline {
                         script {
                             echo 'Building test Docker Image for company...'
                             sh '''
-                                docker build -t dangxuancuong/company_jenkins_test:${DOCKER_TAG} ./company
+                                docker build -t nguyenhung1402/company_jenkins_test:${DOCKER_TAG} ./company
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/company_jenkins_test:${DOCKER_TAG}
+                                docker push nguyenhung1402/company_jenkins_test:${DOCKER_TAG}
                             '''
                             env.BUILD_TEST_SERVICE_2 = "true"
                         }
@@ -187,9 +184,9 @@ pipeline {
                         script {
                             echo 'Building test Docker Image for user...'
                             sh '''
-                                docker build -t dangxuancuong/user_jenkins_test:${DOCKER_TAG} ./user
+                                docker build -t nguyenhung1402/user_jenkins_test:${DOCKER_TAG} ./user
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/user_jenkins_test:${DOCKER_TAG}
+                                docker push nguyenhung1402/user_jenkins_test:${DOCKER_TAG}
                             '''
                             env.BUILD_TEST_SERVICE_3 = "true"
                         }
@@ -205,14 +202,14 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_jenkins"
-                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_jenkins"
-                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_jenkins"
+                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
+                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
+                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
 
                             sh '''
-                                docker pull dangxuancuong/$JOB
-                                docker pull dangxuancuong/$COMPANY
-                                docker pull dangxuancuong/$USER
+                                docker pull nguyenhung1402/$JOB
+                                docker pull nguyenhung1402/$COMPANY
+                                docker pull nguyenhung1402/$USER
 
                                 docker-compose up -d
 
@@ -270,9 +267,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for job...'
                             sh '''
-                                docker build -t dangxuancuong/job_jenkins ./job
+                                docker build -t nguyenhung1402/job_svc ./job
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/job_jenkins
+                                docker push nguyenhung1402/job_svc
                             '''
                         }
                     }
@@ -289,9 +286,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for company...'
                             sh '''
-                                docker build -t dangxuancuong/company_jenkins ./company
+                                docker build -t nguyenhung1402/company_svc ./company
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/company_jenkins
+                                docker push nguyenhung1402/company_svc
                             '''
                         }
                     }
@@ -308,9 +305,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for user...'
                             sh '''
-                                docker build -t dangxuancuong/user_jenkins ./user
+                                docker build -t nguyenhung1402/user_svc ./user
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push dangxuancuong/user_jenkins
+                                docker push nguyenhung1402/user_svc
                             '''
                         }
                     }
