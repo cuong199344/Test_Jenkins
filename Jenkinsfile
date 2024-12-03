@@ -2,6 +2,9 @@ pipeline {
     agent any
     
     environment {
+        // USER_IMAGE = 'nguyenhung1402/user_svc'
+        // COMPANY_IMAGE = 'nguyenhung1402/company_svc'
+        // JOB_IMAGE = 'nguyenhung1402/job_svc'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -25,6 +28,7 @@ pipeline {
             }
         }
         // hung
+        
         
         // stage('SonarQube Analysis') {
         //     environment {
@@ -194,7 +198,6 @@ pipeline {
                     }
                 }
                 stage('Docker-compose'){
-
                     when{
                         anyOf{
                             expression { env.BUILD_TEST_SERVICE_1 == "true" };
@@ -204,14 +207,11 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
-                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
-                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
-
+                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc:latest"
+                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc:latest"
+                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc:latest"
 
                             sh '''
-                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                echo "Running docker-compose..."
                                 JOB_IMAGE=nguyenhung1402/$JOB USER_IMAGE=nguyenhung1402/$USER COMPANY_IMAGE=nguyenhung1402/$COMPANY docker-compose up -d
 
                                 docker ps
@@ -248,7 +248,7 @@ pipeline {
                     steps{
                         script{
                             sh '''
-                                JOB_IMAGE=nguyenhung1402/$JOB USER_IMAGE=nguyenhung1402/$USER COMPANY_IMAGE=nguyenhung1402/$COMPANY docker-compose down
+                                docker-compose down
                                 docker system prune -f
 
                                 docker ps
@@ -256,94 +256,93 @@ pipeline {
                         }
                     }
                 }
-
-                stage('Build Docker Image for job') {
-                    when {
-                        anyOf{
-                            expression { env.BUILD_TEST_SERVICE_1 == "true" };
-                            expression { env.FINISH_TEST == "true"};
-                        }
-                    }
-                    steps {
-                        script {
-                            echo 'Building Docker Image for job...'
-                            sh '''
-                                docker build -t nguyenhung1402/job_svc ./job
-                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/job_svc
-                            '''
-                        }
-                    }
-                }
-        
-                stage('Build Docker Image for company') {
-                    when {
-                        anyOf{
-                            expression { env.BUILD_TEST_SERVICE_2 == "true" };
-                            expression { env.FINISH_TEST == "true"};
-                        }
-                    }
-                    steps {
-                        script {
-                            echo 'Building Docker Image for company...'
-                            sh '''
-                                docker build -t nguyenhung1402/company_svc ./company
-                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/company_svc
-                            '''
-                        }
-                    }
-                }
                 
-                stage('Build Docker Image for user') {
-                    when {
-                        anyOf{
-                            expression { env.BUILD_TEST_SERVICE_3 == "true" };
-                            expression { env.FINISH_TEST == "true"};
-                        }
-                    }
-                    steps {
-                        script {
-                            echo 'Building Docker Image for user...'
-                            sh '''
-                                docker build -t nguyenhung1402/user_svc ./user
-                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/user_svc
-                            '''
-                        }
-                    }
-                }
-                
+            }
+        }
+        stage('Test master'){
+            when{
+                branch 'master';
+            }
+            steps{
+                echo 'Testing push to master'
             }
         }
 
         // stage('test k8s') {
         //     when{
-        //         branch 'master'
+        //         branch 'master';
         //     }
         //    agent {
         //         kubernetes {
         //             yaml '''
-        //                 apiVersion: v1
-        //                 kind: Pod
-        //                 spec:
+        //               apiVersion: v1
+        //               kind: Pod
+        //               spec:
         //                 containers:
         //                 - name: k8s
-        //                     image: busybox
-        //                     command:
-        //                     - sh
-        //                     - -c
-        //                     - |
+        //                   image: busybox
+        //                   command:
+        //                   - sh
+        //                   - -c
+        //                   - |
         //                     mkdir -p /usr/local/bin && \
         //                     wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
         //                     chmod +x /usr/local/bin/kubectl && \
         //                     sleep infinity
-        //                     tty: true
+        //                   tty: true
         //                 restartPolicy: Never
         //             '''
         //         }
         //     }
         //     stages {
+        //         stage('Build Docker Image for job') {
+        //             when {
+        //                 expression { env.BUILD_SERVICE1 == "true" };
+        //             }
+        //             steps {
+        //                 script {
+        //                     echo 'Building Docker Image for job...'
+        //                     sh '''
+        //                         docker build -t nguyenhung1402/job_svc:latest ./job
+        //                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                         docker push nguyenhung1402/job_svc:latest
+        //                     '''
+        //                 }
+        //             }
+        //         }
+        
+        //         stage('Build Docker Image for company') {
+        //             when {
+        //                 expression { env.BUILD_SERVICE2 == "true" };
+        //             }
+        //             steps {
+        //                 script {
+        //                     echo 'Building Docker Image for company...'
+        //                     sh '''
+        //                         docker build -t nguyenhung1402/company_svc:latest ./company
+        //                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                         docker push nguyenhung1402/company_svc:latest
+        //                     '''
+        //                 }
+        //             }
+        //         }
+                
+        //         stage('Build Docker Image for user') {
+        //             when {
+        //                 expression { env.BUILD_SERVICE3 == "true" };
+        //             }
+        //             steps {
+        //                 script {
+        //                     echo 'Building Docker Image for user...'
+        //                     sh '''
+        //                         docker build -t nguyenhung1402/user_svc:latest ./user
+        //                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                         docker push nguyenhung1402/user_svc:latest
+        //                     '''
+        //                 }
+        //             }
+        //         }                
+
         //         stage('Verify kubectl') {
         //             steps {
         //                 container('k8s') {
@@ -358,7 +357,7 @@ pipeline {
         //             steps {
         //                 container('k8s') {
         //                 sh '''
-        //                     kubectl set image deployment/user-depl user=nguyenhung1402/user_jenkins:${DOCKER_TAG} -n default
+        //                     kubectl set image deployment/user-depl user=nguyenhung1402/user_svc:latest -n default
                             
         //                 '''
         //                 }
@@ -371,7 +370,7 @@ pipeline {
         //             steps {
         //                 container('k8s') {
         //                 sh '''
-        //                     kubectl set image deployment/company-depl  company=nguyenhung1402/company_jenkins:${DOCKER_TAG} -n default
+        //                     kubectl set image deployment/company-depl  company=nguyenhung1402/company:latest -n default
                             
         //                 '''
         //                 }
@@ -384,7 +383,7 @@ pipeline {
         //             steps {
         //                 container('k8s') {
         //                 sh '''
-        //                     kubectl set image deployment/job-depl job=nguyenhung1402/job_jenkins:${DOCKER_TAG} -n default
+        //                     kubectl set image deployment/job-depl job=nguyenhung1402/job_svc:latest -n default
                             
         //                 '''
         //                 }
@@ -396,7 +395,7 @@ pipeline {
     post {
         always {
             sh '''
-                JOB_IMAGE=nguyenhung1402/$JOB USER_IMAGE=nguyenhung1402/$USER COMPANY_IMAGE=nguyenhung1402/$COMPANY docker-compose down
+                docker-compose down
                 docker system prune -f
             '''
         }
