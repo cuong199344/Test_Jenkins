@@ -353,7 +353,7 @@ pipeline {
                     steps {
                         container('k8s') {
                         sh '''
-                            kubectl set image deployment/user-depl user=nguyenhung1402/user_jenkins:${DOCKER_TAG} -n default
+                            kubectl set image deployment/user-depl user=nguyenhung1402/user_svc:latest -n default
                             
                         '''
                         }
@@ -366,7 +366,7 @@ pipeline {
                     steps {
                         container('k8s') {
                         sh '''
-                            kubectl set image deployment/company-depl  company=nguyenhung1402/company_jenkins:${DOCKER_TAG} -n default
+                            kubectl set image deployment/company-depl  company=nguyenhung1402/company:latest -n default
                             
                         '''
                         }
@@ -379,7 +379,7 @@ pipeline {
                     steps {
                         container('k8s') {
                         sh '''
-                            kubectl set image deployment/job-depl job=nguyenhung1402/job_jenkins:${DOCKER_TAG} -n default
+                            kubectl set image deployment/job-depl job=nguyenhung1402/job_svc:latest -n default
                             
                         '''
                         }
