@@ -2,6 +2,9 @@ pipeline {
     agent any
     
     environment {
+        // USER_IMAGE = 'nguyenhung1402/user_svc'
+        // COMPANY_IMAGE = 'nguyenhung1402/company_svc'
+        // JOB_IMAGE = 'nguyenhung1402/job_svc'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -202,14 +205,14 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
-                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
-                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
+                            env.JOB_IMAGE = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
+                            env.COMPANY_IMAGE = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
+                            env.USER_IMAGE = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
 
                             sh '''
-                                docker pull nguyenhung1402/$JOB
-                                docker pull nguyenhung1402/$COMPANY
-                                docker pull nguyenhung1402/$USER
+                                docker pull nguyenhung1402/$JOB_IMAGE
+                                docker pull nguyenhung1402/$COMPANY_IMAGE
+                                docker pull nguyenhung1402/$USER_IMAGE
 
                                 docker-compose up -d
 
