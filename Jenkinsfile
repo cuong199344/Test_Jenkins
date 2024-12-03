@@ -271,21 +271,21 @@ pipeline {
            agent {
                 kubernetes {
                     yaml '''
-                        apiVersion: v1
-                        kind: Pod
-                        spec:
+                      apiVersion: v1
+                      kind: Pod
+                      spec:
                         containers:
                         - name: k8s
-                            image: busybox
-                            command:
-                            - sh
-                            - -c
-                            - |
+                          image: busybox
+                          command:
+                          - sh
+                          - -c
+                          - |
                             mkdir -p /usr/local/bin && \
                             wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
                             chmod +x /usr/local/bin/kubectl && \
                             sleep infinity
-                            tty: true
+                          tty: true
                         restartPolicy: Never
                     '''
                 }
