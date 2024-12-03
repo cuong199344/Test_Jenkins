@@ -205,14 +205,14 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
-                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
-                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
+                            env.JOB_IMAGE = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
+                            env.COMPANY_IMAGE = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
+                            env.USER_IMAGE = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
 
                             sh '''
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 echo "Running docker-compose..."
-                                env.JOB_IMAGE=$JOB env.COMPANY_IMAGE=$COMPANY env.USER_IMAGE=$USER  docker-compose up -d 
+                                docker-compose up -d 
 
                                 docker ps
                             '''
