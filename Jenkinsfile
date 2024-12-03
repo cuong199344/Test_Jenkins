@@ -259,130 +259,138 @@ pipeline {
                 
             }
         }
-
-        stage('test k8s') {
+        stage('Test master'){
             when{
-                branch 'master'
+                branch 'master';
             }
-           agent {
-                kubernetes {
-                    yaml '''
-                      apiVersion: v1
-                      kind: Pod
-                      spec:
-                        containers:
-                        - name: k8s
-                          image: busybox
-                          command:
-                          - sh
-                          - -c
-                          - |
-                            mkdir -p /usr/local/bin && \
-                            wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
-                            chmod +x /usr/local/bin/kubectl && \
-                            sleep infinity
-                          tty: true
-                        restartPolicy: Never
-                    '''
-                }
-            }
-            stages {
-                stage('Build Docker Image for job') {
-                    when {
-                        expression { env.BUILD_SERVICE1 == "true" };
-                    }
-                    steps {
-                        script {
-                            echo 'Building Docker Image for job...'
-                            sh '''
-                                docker build -t nguyenhung1402/job_svc:latest ./job
-                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/job_svc:latest
-                            '''
-                        }
-                    }
-                }
-        
-                stage('Build Docker Image for company') {
-                    when {
-                        expression { env.BUILD_SERVICE2 == "true" };
-                    }
-                    steps {
-                        script {
-                            echo 'Building Docker Image for company...'
-                            sh '''
-                                docker build -t nguyenhung1402/company_svc:latest ./company
-                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/company_svc:latest
-                            '''
-                        }
-                    }
-                }
-                
-                stage('Build Docker Image for user') {
-                    when {
-                        expression { env.BUILD_SERVICE3 == "true" };
-                    }
-                    steps {
-                        script {
-                            echo 'Building Docker Image for user...'
-                            sh '''
-                                docker build -t nguyenhung1402/user_svc:latest ./user
-                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/user_svc:latest
-                            '''
-                        }
-                    }
-                }                
-
-                stage('Verify kubectl') {
-                    steps {
-                        container('k8s') {
-                        sh 'kubectl get deployments -n default'
-                        }
-                    }
-                }
-                stage('deploy user'){
-                    when {
-                        expression { env.BUILD_SERVICE3 == "true" }
-                    }
-                    steps {
-                        container('k8s') {
-                        sh '''
-                            kubectl set image deployment/user-depl user=nguyenhung1402/user_svc:latest -n default
-                            
-                        '''
-                        }
-                    }
-                }
-                stage('deploy company'){
-                    when {
-                        expression { env.BUILD_SERVICE2 == "true" }
-                    }
-                    steps {
-                        container('k8s') {
-                        sh '''
-                            kubectl set image deployment/company-depl  company=nguyenhung1402/company:latest -n default
-                            
-                        '''
-                        }
-                    }
-                }
-                stage('deploy job'){
-                    when {
-                        expression { env.BUILD_SERVICE1 == "true" }
-                    }
-                    steps {
-                        container('k8s') {
-                        sh '''
-                            kubectl set image deployment/job-depl job=nguyenhung1402/job_svc:latest -n default
-                            
-                        '''
-                        }
-                    }
-                }   
+            steps{
+                echo 'Testing push to master'
             }
         }
+
+        // stage('test k8s') {
+        //     when{
+        //         branch 'master';
+        //     }
+        //    agent {
+        //         kubernetes {
+        //             yaml '''
+        //               apiVersion: v1
+        //               kind: Pod
+        //               spec:
+        //                 containers:
+        //                 - name: k8s
+        //                   image: busybox
+        //                   command:
+        //                   - sh
+        //                   - -c
+        //                   - |
+        //                     mkdir -p /usr/local/bin && \
+        //                     wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
+        //                     chmod +x /usr/local/bin/kubectl && \
+        //                     sleep infinity
+        //                   tty: true
+        //                 restartPolicy: Never
+        //             '''
+        //         }
+        //     }
+        //     stages {
+        //         stage('Build Docker Image for job') {
+        //             when {
+        //                 expression { env.BUILD_SERVICE1 == "true" };
+        //             }
+        //             steps {
+        //                 script {
+        //                     echo 'Building Docker Image for job...'
+        //                     sh '''
+        //                         docker build -t nguyenhung1402/job_svc:latest ./job
+        //                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                         docker push nguyenhung1402/job_svc:latest
+        //                     '''
+        //                 }
+        //             }
+        //         }
+        
+        //         stage('Build Docker Image for company') {
+        //             when {
+        //                 expression { env.BUILD_SERVICE2 == "true" };
+        //             }
+        //             steps {
+        //                 script {
+        //                     echo 'Building Docker Image for company...'
+        //                     sh '''
+        //                         docker build -t nguyenhung1402/company_svc:latest ./company
+        //                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                         docker push nguyenhung1402/company_svc:latest
+        //                     '''
+        //                 }
+        //             }
+        //         }
+                
+        //         stage('Build Docker Image for user') {
+        //             when {
+        //                 expression { env.BUILD_SERVICE3 == "true" };
+        //             }
+        //             steps {
+        //                 script {
+        //                     echo 'Building Docker Image for user...'
+        //                     sh '''
+        //                         docker build -t nguyenhung1402/user_svc:latest ./user
+        //                         docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+        //                         docker push nguyenhung1402/user_svc:latest
+        //                     '''
+        //                 }
+        //             }
+        //         }                
+
+        //         stage('Verify kubectl') {
+        //             steps {
+        //                 container('k8s') {
+        //                 sh 'kubectl get deployments -n default'
+        //                 }
+        //             }
+        //         }
+        //         stage('deploy user'){
+        //             when {
+        //                 expression { env.BUILD_SERVICE3 == "true" }
+        //             }
+        //             steps {
+        //                 container('k8s') {
+        //                 sh '''
+        //                     kubectl set image deployment/user-depl user=nguyenhung1402/user_svc:latest -n default
+                            
+        //                 '''
+        //                 }
+        //             }
+        //         }
+        //         stage('deploy company'){
+        //             when {
+        //                 expression { env.BUILD_SERVICE2 == "true" }
+        //             }
+        //             steps {
+        //                 container('k8s') {
+        //                 sh '''
+        //                     kubectl set image deployment/company-depl  company=nguyenhung1402/company:latest -n default
+                            
+        //                 '''
+        //                 }
+        //             }
+        //         }
+        //         stage('deploy job'){
+        //             when {
+        //                 expression { env.BUILD_SERVICE1 == "true" }
+        //             }
+        //             steps {
+        //                 container('k8s') {
+        //                 sh '''
+        //                     kubectl set image deployment/job-depl job=nguyenhung1402/job_svc:latest -n default
+                            
+        //                 '''
+        //                 }
+        //             }
+        //         }   
+        //     }
+        // }
     }
     post {
         always {
