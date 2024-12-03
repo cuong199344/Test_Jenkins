@@ -253,6 +253,7 @@ pipeline {
 
                                 docker ps
                             '''
+                            env.OK_TO_RUN_MASTER = "true" 
                         }
                     }
                 }
@@ -315,9 +316,6 @@ pipeline {
         }
 
         stage('test k8s') {
-            when{
-                branch 'master';
-            }
            agent {
                 kubernetes {
                     yaml '''
@@ -339,6 +337,9 @@ pipeline {
                         restartPolicy: Never
                     '''
                 }
+            }
+            when{
+                branch 'master'
             }
             stages {               
 
