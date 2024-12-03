@@ -211,11 +211,7 @@ pipeline {
 
                             sh '''
                                 echo "Running docker-compose..."
-                                JOB_IMAGE=$JOB \
-                                COMPANY_IMAGE=$COMPANY \
-                                USER_IMAGE=$USER \
-
-                                docker-compose up -d 
+                                JOB_IMAGE=$JOB COMPANY_IMAGE=$COMPANY USER_IMAGE=$USER  docker-compose up -d 
 
                                 docker ps
                             '''
