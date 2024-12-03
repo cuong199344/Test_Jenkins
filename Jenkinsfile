@@ -24,6 +24,7 @@ pipeline {
                 }
             }
         }
+        // hung
         
         // stage('SonarQube Analysis') {
         //     environment {
