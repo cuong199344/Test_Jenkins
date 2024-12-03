@@ -212,7 +212,7 @@ pipeline {
                             sh '''
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 echo "Running docker-compose..."
-                                $JOB_IMAGE=$JOB $COMPANY_IMAGE=$COMPANY $USER_IMAGE=$USER  docker-compose up -d 
+                                env.JOB_IMAGE=$JOB env.COMPANY_IMAGE=$COMPANY env.USER_IMAGE=$USER  docker-compose up -d 
 
                                 docker ps
                             '''
