@@ -207,9 +207,9 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB_IMAGE = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
-                            env.COMPANY_IMAGE = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
-                            env.USER_IMAGE = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
+                            env.JOB_IMAGE = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc:latest"
+                            env.COMPANY_IMAGE = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc:latest"
+                            env.USER_IMAGE = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc:latest"
 
                             sh '''
                                 docker pull nguyenhung1402/$JOB_IMAGE
@@ -299,9 +299,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for job...'
                             sh '''
-                                docker build -t nguyenhung1402/job_svc ./job
+                                docker build -t nguyenhung1402/job_svc:latest ./job
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/job_svc
+                                docker push nguyenhung1402/job_svc:latest
                             '''
                         }
                     }
@@ -315,9 +315,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for company...'
                             sh '''
-                                docker build -t nguyenhung1402/company_svc ./company
+                                docker build -t nguyenhung1402/company_svc:latest ./company
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/company_svc
+                                docker push nguyenhung1402/company_svc:latest
                             '''
                         }
                     }
@@ -331,9 +331,9 @@ pipeline {
                         script {
                             echo 'Building Docker Image for user...'
                             sh '''
-                                docker build -t nguyenhung1402/user_svc ./user
+                                docker build -t nguyenhung1402/user_svc:latest ./user
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
-                                docker push nguyenhung1402/user_svc
+                                docker push nguyenhung1402/user_svc:latest
                             '''
                         }
                     }
