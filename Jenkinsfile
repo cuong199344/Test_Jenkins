@@ -210,12 +210,10 @@ pipeline {
                             env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
 
                             sh '''
-                                JOB_IMAGE = $JOB
-                                COMPANY_IMAGE = $COMPANY
-                                USER_IMAGE = $USER
-                                // docker pull nguyenhung1402/$JOB_IMAGE
-                                // docker pull nguyenhung1402/$COMPANY_IMAGE
-                                // docker pull nguyenhung1402/$USER_IMAGE
+                                echo "Running docker-compose..."
+                                JOB_IMAGE=$JOB \
+                                COMPANY_IMAGE=$COMPANY \
+                                USER_IMAGE=$USER \
 
                                 docker-compose up -d 
 
