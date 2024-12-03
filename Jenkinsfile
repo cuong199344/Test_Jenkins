@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     environment {
-        // USER_IMAGE = 'nguyenhung1402/user_svc'
-        // COMPANY_IMAGE = 'nguyenhung1402/company_svc'
-        // JOB_IMAGE = 'nguyenhung1402/job_svc'
+        USER_IMAGE = 'nguyenhung1402/user_svc'
+        COMPANY_IMAGE = 'nguyenhung1402/company_svc'
+        JOB_IMAGE = 'nguyenhung1402/job_svc'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -212,7 +212,7 @@ pipeline {
                             sh '''
                                 docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 echo "Running docker-compose..."
-                                JOB_IMAGE=$JOB COMPANY_IMAGE=$COMPANY USER_IMAGE=$USER  docker-compose up -d 
+                                $JOB_IMAGE=$JOB $COMPANY_IMAGE=$COMPANY $USER_IMAGE=$USER  docker-compose up -d 
 
                                 docker ps
                             '''
