@@ -210,6 +210,7 @@ pipeline {
                             env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
 
                             sh '''
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
                                 echo "Running docker-compose..."
                                 JOB_IMAGE=$JOB COMPANY_IMAGE=$COMPANY USER_IMAGE=$USER  docker-compose up -d 
 
