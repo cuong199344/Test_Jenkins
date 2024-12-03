@@ -259,42 +259,11 @@ pipeline {
                 
             }
         }
-        // stage('Test master'){
-        //     when{
-        //         branch 'master';
-        //     }
-        //     steps{
-        //         echo 'Testing push to master'
-        //     }
-        // }
-
-        stage('test k8s') {
+        stage('Test master'){
             when{
                 branch 'master';
             }
-           agent {
-                kubernetes {
-                    yaml '''
-                      apiVersion: v1
-                      kind: Pod
-                      spec:
-                        containers:
-                        - name: k8s
-                          image: busybox
-                          command:
-                          - sh
-                          - -c
-                          - |
-                            mkdir -p /usr/local/bin && \
-                            wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
-                            chmod +x /usr/local/bin/kubectl && \
-                            sleep infinity
-                          tty: true
-                        restartPolicy: Never
-                    '''
-                }
-            }
-            stages {
+            stages{
                 stage('Build Docker Image for job') {
                     when {
                         expression { env.BUILD_SERVICE1 == "true" };
@@ -341,7 +310,37 @@ pipeline {
                             '''
                         }
                     }
-                }                
+                }  
+            }
+        }
+
+        stage('test k8s') {
+            when{
+                branch 'master';
+            }
+           agent {
+                kubernetes {
+                    yaml '''
+                      apiVersion: v1
+                      kind: Pod
+                      spec:
+                        containers:
+                        - name: k8s
+                          image: busybox
+                          command:
+                          - sh
+                          - -c
+                          - |
+                            mkdir -p /usr/local/bin && \
+                            wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
+                            chmod +x /usr/local/bin/kubectl && \
+                            sleep infinity
+                          tty: true
+                        restartPolicy: Never
+                    '''
+                }
+            }
+            stages {               
 
                 stage('Verify kubectl') {
                     steps {
