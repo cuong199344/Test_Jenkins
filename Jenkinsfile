@@ -2,9 +2,6 @@ pipeline {
     agent any
     
     environment {
-        // USER_IMAGE = 'nguyenhung1402/user_svc'
-        // COMPANY_IMAGE = 'nguyenhung1402/company_svc'
-        // JOB_IMAGE = 'nguyenhung1402/job_svc'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -197,6 +194,7 @@ pipeline {
                     }
                 }
                 stage('Docker-compose'){
+
                     when{
                         anyOf{
                             expression { env.BUILD_TEST_SERVICE_1 == "true" };
@@ -206,16 +204,15 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB_IMAGE = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
-                            env.COMPANY_IMAGE = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
-                            env.USER_IMAGE = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
+                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
+                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
+                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
+
 
                             sh '''
-                                docker pull nguyenhung1402/$JOB_IMAGE
-                                docker pull nguyenhung1402/$COMPANY_IMAGE
-                                docker pull nguyenhung1402/$USER_IMAGE
-
-                                docker-compose up -d
+                                docker login -u $DOCKER_HUB_CREDENTIALS_USR -p $DOCKER_HUB_CREDENTIALS_PSW
+                                echo "Running docker-compose..."
+                                JOB_IMAGE=nguyenhung1402/$JOB USER_IMAGE=nguyenhung1402/$USER COMPANY_IMAGE=nguyenhung1402/$COMPANY docker-compose up -d
 
                                 docker ps
                             '''
@@ -251,7 +248,7 @@ pipeline {
                     steps{
                         script{
                             sh '''
-                                docker-compose down
+                                JOB_IMAGE=nguyenhung1402/$JOB USER_IMAGE=nguyenhung1402/$USER COMPANY_IMAGE=nguyenhung1402/$COMPANY docker-compose down
                                 docker system prune -f
 
                                 docker ps
@@ -399,7 +396,7 @@ pipeline {
     post {
         always {
             sh '''
-                docker-compose down
+                JOB_IMAGE=nguyenhung1402/$JOB USER_IMAGE=nguyenhung1402/$USER COMPANY_IMAGE=nguyenhung1402/$COMPANY docker-compose down
                 docker system prune -f
             '''
         }
