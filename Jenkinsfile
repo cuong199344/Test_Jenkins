@@ -205,16 +205,19 @@ pipeline {
                     }
                     steps{
                         script{
-                            env.JOB_IMAGE = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
-                            env.COMPANY_IMAGE = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
-                            env.USER_IMAGE = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
+                            env.JOB = env.BUILD_TEST_SERVICE_1 == "true" ? "job_jenkins_test:${DOCKER_TAG}" : "job_svc"
+                            env.COMPANY = env.BUILD_TEST_SERVICE_2 == "true" ? "company_jenkins_test:${DOCKER_TAG}" : "company_svc"
+                            env.USER = env.BUILD_TEST_SERVICE_3 == "true" ? "user_jenkins_test:${DOCKER_TAG}" : "user_svc"
 
                             sh '''
-                                docker pull nguyenhung1402/$JOB_IMAGE
-                                docker pull nguyenhung1402/$COMPANY_IMAGE
-                                docker pull nguyenhung1402/$USER_IMAGE
+                                JOB_IMAGE = $JOB
+                                COMPANY_IMAGE = $COMPANY
+                                USER_IMAGE = $USER
+                                // docker pull nguyenhung1402/$JOB_IMAGE
+                                // docker pull nguyenhung1402/$COMPANY_IMAGE
+                                // docker pull nguyenhung1402/$USER_IMAGE
 
-                                docker-compose up -d
+                                docker-compose up -d 
 
                                 docker ps
                             '''
