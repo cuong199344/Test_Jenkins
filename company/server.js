@@ -7,7 +7,7 @@ dbConnection();
 const PORT = process.env.PORT || 8800;
 
 const server = app.listen(PORT, () => {
-  console.log(`Dev Server running on port!!!(12/5/2024:12:35): ${PORT}`);
+  console.log(`Dev Server running on port!!! (12/5/24): ${PORT}`);
 });
 
 export default server;
