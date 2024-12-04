@@ -92,10 +92,9 @@ pipeline {
                                     npm install
                                     npm run test
                                 ''', 
-                                returnStatus: true // Trả về mã thoát của lệnh
+                                returnStatus: true
                             )
 
-                            // Kiểm tra kết quả và thiết lập biến môi trường
                             if (testResult == 0) {
                                 echo "Tests passed!"
                                 env.TEST_COMPANY_RESULT = "PASSED"
