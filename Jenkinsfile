@@ -2,9 +2,6 @@ pipeline {
     agent any
     
     environment {
-        // USER_IMAGE = 'nguyenhung1402/user_svc'
-        // COMPANY_IMAGE = 'nguyenhung1402/company_svc'
-        // JOB_IMAGE = 'nguyenhung1402/job_svc'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -27,7 +24,6 @@ pipeline {
                 }
             }
         }
-        // hung
         
         
         // stage('SonarQube Analysis') {
