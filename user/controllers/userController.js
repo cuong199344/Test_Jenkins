@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Users from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 
-export const register = async (req, res, next) => {
+export const regis?ter = async (req, res, next) => {
   const { firstName, lastName, email, password } = req.body;
 
   //validate fileds
