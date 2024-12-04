@@ -2,9 +2,6 @@ pipeline {
     agent any
     
     environment {
-        // USER_IMAGE = 'nguyenhung1402/user_svc'
-        // COMPANY_IMAGE = 'nguyenhung1402/company_svc'
-        // JOB_IMAGE = 'nguyenhung1402/job_svc'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -27,7 +24,6 @@ pipeline {
                 }
             }
         }
-        // hung
         
         
         // stage('SonarQube Analysis') {
@@ -96,10 +92,9 @@ pipeline {
                                     npm install
                                     npm run test
                                 ''', 
-                                returnStatus: true // Trả về mã thoát của lệnh
+                                returnStatus: true
                             )
 
-                            // Kiểm tra kết quả và thiết lập biến môi trường
                             if (testResult == 0) {
                                 echo "Tests passed!"
                                 env.TEST_COMPANY_RESULT = "PASSED"
@@ -253,6 +248,7 @@ pipeline {
 
                                 docker ps
                             '''
+                            env.OK_TO_RUN_MASTER = "true" 
                         }
                     }
                 }
@@ -316,7 +312,7 @@ pipeline {
 
         stage('test k8s') {
             when{
-                branch 'master';
+                branch 'master'
             }
            agent {
                 kubernetes {
