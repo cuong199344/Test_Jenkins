@@ -2,9 +2,6 @@ pipeline {
     agent any
     
     environment {
-        // USER_IMAGE = 'nguyenhung1402/user_svc'
-        // COMPANY_IMAGE = 'nguyenhung1402/company_svc'
-        // JOB_IMAGE = 'nguyenhung1402/job_svc'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
         GIT_CREDENTIALS_ID = 'github-credentials'
         // SONAR_TOKEN = credentials('sonar-token-id')
@@ -27,7 +24,6 @@ pipeline {
                 }
             }
         }
-        // hung
         
         
         // stage('SonarQube Analysis') {
@@ -96,10 +92,9 @@ pipeline {
                                     npm install
                                     npm run test
                                 ''', 
-                                returnStatus: true // Trả về mã thoát của lệnh
+                                returnStatus: true
                             )
 
-                            // Kiểm tra kết quả và thiết lập biến môi trường
                             if (testResult == 0) {
                                 echo "Tests passed!"
                                 env.TEST_COMPANY_RESULT = "PASSED"
@@ -253,16 +248,16 @@ pipeline {
 
                                 docker ps
                             '''
+                            env.OK_TO_RUN_MASTER = "true" 
                         }
                     }
                 }
                 
             }
         }
-
-        stage('test k8s') {
+        stage('Test master'){
             when{
-                branch 'master'
+                branch 'master';
             }
            agent {
                 kubernetes_1 {
@@ -333,7 +328,37 @@ pipeline {
                             '''
                         }
                     }
-                }                
+                }  
+            }
+        }
+
+        stage('test k8s') {
+            when{
+                branch 'master'
+            }
+           agent {
+                kubernetes {
+                    yaml '''
+                      apiVersion: v1
+                      kind: Pod
+                      spec:
+                        containers:
+                        - name: k8s
+                          image: busybox
+                          command:
+                          - sh
+                          - -c
+                          - |
+                            mkdir -p /usr/local/bin && \
+                            wget --no-check-certificate -q -O /usr/local/bin/kubectl https://dl.k8s.io/release/$(wget --no-check-certificate -q -O - https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && \
+                            chmod +x /usr/local/bin/kubectl && \
+                            sleep infinity
+                          tty: true
+                        restartPolicy: Never
+                    '''
+                }
+            }
+            stages {               
 
                 stage('Verify kubectl') {
                     steps {
@@ -350,7 +375,7 @@ pipeline {
                         container('k8s') {
                         sh '''
                             kubectl set image deployment/user-depl user=nguyenhung1402/user_svc:latest -n default
-                            
+                            kubectl rollout restart deployment/user-depl -n default
                         '''
                         }
                     }
@@ -362,8 +387,8 @@ pipeline {
                     steps {
                         container('k8s') {
                         sh '''
-                            kubectl set image deployment/company-depl  company=nguyenhung1402/company:latest -n default
-                            
+                            kubectl set image deployment/company-depl  company=nguyenhung1402/company_svc:latest -n default
+                            kubectl rollout restart deployment/company-depl -n default
                         '''
                         }
                     }
@@ -376,7 +401,7 @@ pipeline {
                         container('k8s') {
                         sh '''
                             kubectl set image deployment/job-depl job=nguyenhung1402/job_svc:latest -n default
-                            
+                            kubectl rollout restart deployment/job-depl -n default
                         '''
                         }
                     }
