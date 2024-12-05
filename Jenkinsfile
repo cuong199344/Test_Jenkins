@@ -260,7 +260,7 @@ pipeline {
                 branch 'master';
             }
            agent {
-                kubernetes_1 {
+                kubernetes {
                     yaml '''
                       apiVersion: v1
                       kind: Pod
